@@ -1,0 +1,50 @@
+[repository]
+root = "~/.agents/paper-reading-skills"
+user_skill_dir = "~/.agents/skills"
+
+[zotero]
+data_dir = "~/Zotero"
+storage_dir = "~/Zotero/storage"
+db_path = "~/Zotero/zotero.sqlite"
+
+[state]
+reading_queue = "state/reading_queue.json"
+processed_papers = "state/processed_papers.json"
+state_schema = "state/state_schema.md"
+candidates_dir = "state/candidates"
+approvals_dir = "state/approvals"
+quick_read_source_cache_dir = "state/cache/quick_read_sources"
+
+[outputs]
+daily_dir = "outputs/daily"
+daily_runs_dir = "outputs/daily"
+papers_dir = "outputs/papers"
+themes_dir = "outputs/themes"
+daily_run_pattern = "outputs/daily/YYYY-MM-DD"
+
+[templates]
+daily_digest = "templates/daily_digest.md"
+quick_read = "templates/quick_read.md"
+
+[scripts]
+build_reading_queue_from_zotero_todo = "scripts/build_reading_queue_from_zotero_todo.py"
+extract_quick_read_source = "scripts/extract_quick_read_source.py"
+
+[pdf]
+pdftotext_path = ""
+extract_text = true
+text_mode = "both"
+max_text_chars = 60000
+cache_ttl_days = 7
+
+[skills]
+daily_paper_triage = "skills/daily-paper-triage/SKILL.md"
+single_paper_quick_read = "skills/single-paper-quick-read/SKILL.md"
+single_paper_deep_read = "skills/single-paper-deep-read/SKILL.md"
+theme_coreading = "skills/theme-coreading/SKILL.md"
+
+[queue]
+todo_tag = "todo"
+daily_limit = 5
+abstract_policy = "truncate"
+abstract_max_chars = 600

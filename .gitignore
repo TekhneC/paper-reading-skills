@@ -1,0 +1,7 @@
+state/cache/
+state/tmp/
+/outputs/
+*.sqlite
+*.sqlite-bak
+*.bak
+*.pdf
