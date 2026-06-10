@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-06-05T00:00:00+08:00",
+  "source": {
+    "type": "daily-paper-triage",
+    "reading_queue": "state/reading_queue.json",
+    "quick_read_outputs": [
+      "outputs/papers/RZVWJTDS/quick_read.json",
+      "outputs/papers/L73225HI/quick_read.json"
+    ]
+  },
+  "approval_status": "pending",
+  "candidates": [
+    {
+      "rank": 1,
+      "paper_key": "L73225HI",
+      "title": "Memory-V2V: Memory-Augmented Video-to-Video Diffusion for Consistent Multi-Turn Editing",
+      "decision_label": "strong_candidate",
+      "recommendation_reason": "Directly relevant to multi-turn generative editing, process-level memory, and cross-turn consistency.",
+      "suggested_deep_read_focus": [
+        "task_formulation",
+        "method_mechanism",
+        "evaluation_metrics",
+        "baseline_design",
+        "ablation_logic",
+        "process_representation"
+      ],
+      "risk_or_uncertainty": "Quantitative tables and ablation details need deep-reading verification.",
+      "evidence_source": "outputs/papers/L73225HI/quick_read.json",
+      "evidence_location": "PDF text cache, no reliable page map",
+      "qualitative_ratings": {
+        "research_fit": "high",
+        "literature_review_value": "high",
+        "task_formulation": "high",
+        "method_mechanism": "high",
+        "evaluation_metrics": "medium",
+        "baseline_comparison": "high",
+        "ablation_logic": "medium",
+        "process_interaction_relevance": "high",
+        "novel_framing": "high",
+        "evidence_confidence": "medium"
+      },
+      "approval_status": "pending"
+    },
+    {
+      "rank": 2,
+      "paper_key": "RZVWJTDS",
+      "title": "PersonaVLM: Long-Term Personalized Multimodal LLMs",
+      "decision_label": "candidate",
+      "recommendation_reason": "Useful for long-term personalization, MLLM memory, and human-AI interaction evaluation framing.",
+      "suggested_deep_read_focus": [
+        "task_formulation",
+        "method_mechanism",
+        "evaluation_metrics",
+        "process_representation",
+        "interaction_design",
+        "ecological_validity"
+      ],
+      "risk_or_uncertainty": "Less directly connected to digital painting process generation; benchmark and ablation details need deep reading.",
+      "evidence_source": "outputs/papers/RZVWJTDS/quick_read.json",
+      "evidence_location": "PDF text cache, no reliable page map",
+      "qualitative_ratings": {
+        "research_fit": "medium",
+        "literature_review_value": "high",
+        "task_formulation": "high",
+        "method_mechanism": "medium",
+        "evaluation_metrics": "high",
+        "baseline_comparison": "medium",
+        "ablation_logic": "unknown",
+        "process_interaction_relevance": "high",
+        "novel_framing": "high",
+        "evidence_confidence": "medium"
+      },
+      "approval_status": "pending"
+    }
+  ]
+}

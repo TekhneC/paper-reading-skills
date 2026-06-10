@@ -11,9 +11,12 @@ db_path = "~/Zotero/zotero.sqlite"
 reading_queue = "state/reading_queue.json"
 processed_papers = "state/processed_papers.json"
 state_schema = "state/state_schema.md"
+technical_support = "state/technical_support.md"
 candidates_dir = "state/candidates"
 approvals_dir = "state/approvals"
 quick_read_source_cache_dir = "state/cache/quick_read_sources"
+deep_read_source_cache_dir = "state/cache/deep_read_sources"
+external_verification_dir = "state/external_verification"
 
 [outputs]
 daily_dir = "outputs/daily"
@@ -25,10 +28,22 @@ daily_run_pattern = "outputs/daily/YYYY-MM-DD"
 [templates]
 daily_digest = "templates/daily_digest.md"
 quick_read = "templates/quick_read.md"
+deep_read_research_full = "templates/deep_read_research_full.md"
+deep_read_research_compact = "templates/deep_read_research_compact.md"
+deep_read_survey_full = "templates/deep_read_survey_full.md"
+deep_read_survey_compact = "templates/deep_read_survey_compact.md"
+deep_read_default_full = "templates/deep_read_default_full.md"
+deep_read_default_compact = "templates/deep_read_default_compact.md"
 
 [scripts]
 build_reading_queue_from_zotero_todo = "scripts/build_reading_queue_from_zotero_todo.py"
 extract_quick_read_source = "scripts/extract_quick_read_source.py"
+approve_deep_read_candidate = "scripts/approve_deep_read_candidate.py"
+extract_deep_read_source = "scripts/extract_deep_read_source.py"
+validate_workflow_outputs = "scripts/validate_workflow_outputs.py"
+update_paper_state = "scripts/update_paper_state.py"
+build_daily_deep_reads_index = "scripts/build_daily_deep_reads_index.py"
+verify_external_evidence = "scripts/verify_external_evidence.py"
 
 [pdf]
 pdftotext_path = "C:/texlive/2025/bin/windows/pdftotext.exe"
@@ -36,6 +51,16 @@ extract_text = true
 text_mode = "both"
 max_text_chars = 60000
 cache_ttl_days = 7
+deep_read_cache_ttl_days = 30
+extract_figures = true
+extract_tables = true
+extract_pages = true
+
+[external_verification]
+enabled = true
+sources = ["arxiv", "crossref", "openalex", "publisher", "openreview"]
+cache_ttl_days = 14
+network_required_for_preprint_status = true
 
 [skills]
 daily_paper_triage = "skills/daily-paper-triage/SKILL.md"

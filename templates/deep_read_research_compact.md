@@ -16,28 +16,52 @@
 * PDF path:
 * Evidence status:
 * Approval source:
+* Quick-read source:
+* Source cache:
+* Text extraction mode:
+* Page evidence status:
+* Output date:
+* Report path:
+* JSON sidecar path:
 * Reading focus:
 * Selected template: templates/deep_read_research_compact.md
 
 ---
 
-## 0. 核心结论先行（executive takeaway）
+## 1. 核心结论与阅读定位（executive takeaway）
 
-用 3–5 句话写出这篇论文的记忆抓手。
+用 3-5 句话写出这篇论文的记忆抓手。
 
 应回答：
 
 1. 这篇论文最值得记住的一点是什么；
-2. 它解决了什么问题；
-3. 它的核心思路是什么；
-4. 它的评估标尺是什么；
-5. 它对用户研究的主要价值是什么。
+2. 它解决什么问题；
+3. 核心思路是什么；
+4. 评价标尺是什么；
+5. 对用户研究的主要价值是什么。
+
+
+### Key figure / visual anchor
+
+Embed the most important figure when available, preferably a model architecture, process diagram, workflow, scope diagram, or taxonomy overview.
+
+```markdown
+![Key figure: <short description>](<relative path to extracted figure image>)
+```
+
+Figure source:
+
+* Figure / page:
+* Why this is the key visual anchor:
+* What it clarifies for the reader:
+* Extraction reliability: rendered page / extracted image / caption-only / needs visual verification
+
 
 ---
 
-## 1. 研究动机（research motivation）
+## 2. 问题、动机与核心思路（problem, motivation, and idea）
 
-### 1.1 作者明确声称的问题
+### 2.1 作者明确声称的问题
 
 *
 
@@ -45,31 +69,25 @@
 
 * （文件名：xxx.pdf，第 x 页）
 
-### 1.2 已有工作的不足
+### 2.2 既有工作的不足
 
 *
 
-### 1.3 我的判断
+### 2.3 Central insight 与关键假设
+
+*
+
+### 2.4 证据支持度与问题成立性判断
 
 *
 
 ---
 
-## 2. 研究思路（research idea）
-
-用一段话说明论文的 central insight、关键假设和预期优势。
-
-证据：
-
-* （文件名：xxx.pdf，第 x 页）
-
----
-
-## 3. 评估指标（evaluation metrics）
+## 3. 评价标尺与证据设计（evaluation metrics and evidence design）
 
 > compact report 仍必须保留 metrics-first，不可压掉评价逻辑。
 
-### 3.1 评估目标
+### 3.1 评价目标
 
 *
 
@@ -79,144 +97,93 @@
 | ------------------- | ------ | ---------------- | ----------------- | --------------- |
 |                     |        |                  |                   |                 |
 
-### 3.3 指标与目标是否匹配
-
-一句到一段说明：
+### 3.3 指标是否支撑主张
 
 *
 
 ---
 
-## 4. 研究方法（research method）
+## 4. 方法机制与实验结果（method and results）
 
 ### 4.1 方法总览
 
 *
 
-### 4.2 输入、输出与核心机制
+### 4.2 核心组件
 
-* Input:
-* Output:
-* Key mechanism:
-* Key assumption:
+| Component | Function | Evidence |
+| --------- | -------- | -------- |
+|           |          | （文件名：xxx.pdf，第 x 页） |
 
-### 4.3 需要精读时再展开的技术细节
+### 4.3 实验设置与主要结果
 
-*
+| Result | Evidence | What it supports | What it does not prove |
+| ------ | -------- | ---------------- | ---------------------- |
+|        | （文件名：xxx.pdf，第 x 页） |                  |                        |
 
----
-
-## 5. 实验设置与结果（experimental setup and results）
-
-### 5.1 实验设置简表
-
-* Dataset / material:
-* Task:
-* Baselines:
-* Evaluation protocol:
-
-### 5.2 主结果与关键消融
-
-| Result / Ablation | Evidence            | What it supports | What it does not prove |
-| ----------------- | ------------------- | ---------------- | ---------------------- |
-|                   | （文件名：xxx.pdf，第 x 页） |                  |                        |
-
-### 5.3 失败案例或边界条件
+### 4.4 消融、定性结果或失败案例
 
 *
 
 ---
 
-## 6. Claim-evidence 检查（claim-evidence alignment）
+## 5. Claim-evidence 对齐与局限（alignment and limitations）
 
-| Claim | Evidence            | Evidence strength                  | What it supports | What it does not prove |
-| ----- | ------------------- | ---------------------------------- | ---------------- | ---------------------- |
-|       | （文件名：xxx.pdf，第 x 页） | strong / moderate / weak / unclear |                  |                        |
+| Claim | Evidence | Evidence strength | Alignment judgment |
+| ----- | -------- | ----------------- | ------------------ |
+|       | （文件名：xxx.pdf，第 x 页） | strong / moderate / weak / unclear |          |
 
-压缩报告中至少检查 2–3 个核心 claim。
-
-重点关注：
-
-* claim 是否超出实验范围；
-* metric 是否真正衡量 claim；
-* baseline 是否公平；
-* 是否存在 overclaiming。
-
----
-
-## 7. 讨论与不足（discussion and limitations）
-
-### 7.1 作者承认的局限
+作者承认的局限：
 
 *
 
-### 7.2 我的补充判断
-
-保留 2–3 个最关键不足：
-
-1.
-2.
-3.
-
-### 7.3 如果是 preprint
-
-如适用，补充：
-
-* 是否缺少关键实验；
-* 是否缺少正式发表版本确认；
-* 是否存在 public review 或版本差异需要检查。
-
----
-
-## 8. 压缩谱系与团队线索（compressed lineage and team signals）
-
-本节可压缩，但建议保留 2–4 个最关键线索。
-
-### 8.1 如果是 classic_paper
-
-| Work | Year | Relation                                         | Confidence                                  |
-| ---- | ---: | ------------------------------------------------ | ------------------------------------------- |
-|      |      | prior / follow-up / citing work / same-team work | confirmed / likely / candidate / unverified |
-
-### 8.2 如果是 new_paper
-
-| Work | Year | Relation                                            | Confidence                                  |
-| ---- | ---: | --------------------------------------------------- | ------------------------------------------- |
-|      |      | prior / baseline / concurrent work / same-team work | confirmed / likely / candidate / unverified |
-
-### 8.3 可压缩判断
-
-若证据不足，写：
-
-> 外部谱系或团队研究线索需要进一步检索确认；当前仅能基于本地 PDF、references、baseline 与 Zotero 索引进行有限判断。
-
----
-
-## 9. 借鉴视角：对用户研究的可借鉴之处（transferable insights）
-
-### 9.1 可以借鉴什么
-
-*
-
-### 9.2 不能直接照搬什么
-
-*
-
-### 9.3 可转化为综述或实验设计的内容
+证据缺口与迁移风险判断：
 
 *
 
 ---
 
-## 10. 压缩英文素材（compact English-ready material）
+## 6. 谱系、团队线索与外部验证（lineage and verification）
 
-### 10.1 Key terms
+> compact report 可以压缩谱系，但不能把未确认线索写成确定结论。
+
+### 6.1 关键前序、baseline 或后续工作
+
+| Work | Year | Relation | Evidence source | Confidence |
+| ---- | ---: | -------- | --------------- | ---------- |
+|      |      |          |                 | confirmed / likely / candidate / unverified |
+
+### 6.2 团队或作者线索
+
+*
+
+### 6.3 需要外部确认的事项
+
+*
+
+---
+
+## 7. 借鉴视角与英文素材（transferable insights and English-ready material）
+
+### 7.1 对用户研究可借鉴之处
+
+*
+
+### 7.2 不能直接照搬之处
+
+*
+
+### 7.3 可转化的后续问题
+
+*
+
+### 7.4 Key terms
 
 | 中文术语 | English term |
-| ---- | ------------ |
-|      |              |
+| -------- | ------------ |
+|          |              |
 
-### 10.2 One-slide takeaway
+### 7.5 One-slide takeaway
 
 *
 *

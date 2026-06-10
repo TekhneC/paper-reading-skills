@@ -14,28 +14,52 @@
 * PDF path:
 * Evidence status:
 * Approval source:
+* Quick-read source:
+* Source cache:
+* Text extraction mode:
+* Page evidence status:
+* Output date:
+* Report path:
+* JSON sidecar path:
 * Reading focus:
 * Selected template: templates/deep_read_survey_compact.md
 
 ---
 
-## 0. 核心结论先行（executive takeaway）
+## 1. 核心结论与范围定位（executive takeaway and scope）
 
-用 3–5 句话写出这篇综述的记忆抓手。
+用 3-5 句话写出这篇综述最值得记住的抓手。
 
 应回答：
 
-1. 这篇综述覆盖什么领域；
-2. 它如何定义范围；
-3. 它采用什么组织角度或 taxonomy；
-4. 它指出哪些核心挑战和未来方向；
-5. 它对用户研究或综述写作有什么价值。
+1. 覆盖什么领域；
+2. 范围和边界是什么；
+3. taxonomy 或组织角度是什么；
+4. 最重要的挑战 / future direction 是什么；
+5. 对用户研究有什么价值。
+
+
+### Key figure / visual anchor
+
+Embed the most important figure when available, preferably a model architecture, process diagram, workflow, scope diagram, or taxonomy overview.
+
+```markdown
+![Key figure: <short description>](<relative path to extracted figure image>)
+```
+
+Figure source:
+
+* Figure / page:
+* Why this is the key visual anchor:
+* What it clarifies for the reader:
+* Extraction reliability: rendered page / extracted image / caption-only / needs visual verification
+
 
 ---
 
-## 1. 综述范围（survey scope）
+## 2. 范围、边界与相邻综述（scope, boundary, and adjacent surveys）
 
-### 1.1 研究对象
+### 2.1 综述范围
 
 *
 
@@ -43,170 +67,107 @@
 
 * （文件名：xxx.pdf，第 x 页）
 
-### 1.2 范围边界
+### 2.2 纳入与排除边界
 
-* Time scope:
-* Domain scope:
-* Problem scope:
-* Not covered:
+| Boundary type | Description | Evidence |
+| ------------- | ----------- | -------- |
+| Inclusion criteria | | （文件名：xxx.pdf，第 x 页） |
+| Exclusion criteria | | （文件名：xxx.pdf，第 x 页） |
+| Adjacent areas mentioned but not covered | | （文件名：xxx.pdf，第 x 页） |
 
-### 1.3 压缩判断
+### 2.3 相邻综述或外部确认需求
 
-该综述的范围是否清楚：
+| Survey / clue | Relation | Confidence | Note |
+| ------------- | -------- | ---------- | ---- |
+|               |          | confirmed / likely / candidate / unverified |      |
+
+---
+
+## 3. 组织逻辑与分类框架（review logic and taxonomy）
+
+### 3.1 组织角度
+
+*
+
+### 3.2 Taxonomy
+
+| Category | Definition | Representative works | Evidence |
+| -------- | ---------- | -------------------- | -------- |
+|          |            |                      | （文件名：xxx.pdf，第 x 页） |
+
+### 3.3 Taxonomy 有效性与可迁移性判断
 
 *
 
 ---
 
-## 2. 纳入与排除边界（inclusion and exclusion boundary）
+## 4. 内容综合与代表进展（content synthesis）
 
-| Boundary type      | Compact description | Evidence            |
-| ------------------ | ------------------- | ------------------- |
-| Inclusion criteria |                     | （文件名：xxx.pdf，第 x 页） |
-| Exclusion criteria |                     | （文件名：xxx.pdf，第 x 页） |
-| Adjacent areas     |                     |                     |
+> 根据论文实际分类增删小节。
 
-压缩判断：
+| Category | Key progress | Main limitation | Relation to user research |
+| -------- | ------------ | --------------- | ------------------------- |
+|          |              |                 |                           |
+
+---
+
+## 5. Scope-taxonomy 对齐、挑战与未来方向（alignment, challenges, and directions）
+
+### 5.1 Scope-taxonomy 检查
+
+*
+
+### 5.2 当前挑战
+
+| Challenge | Evidence | Why it matters |
+| --------- | -------- | -------------- |
+|           | （文件名：xxx.pdf，第 x 页） |                |
+
+### 5.3 未来研究方向
+
+| Direction | Proposed by paper or inferred? | Relation to user research |
+| --------- | ------------------------------ | ------------------------- |
+|           | paper-proposed / inferred      |                           |
+
+---
+
+## 6. 局限、外部线索与验证需求（limitations and verification）
+
+### 6.1 作者承认的局限
+
+*
+
+### 6.2 证据缺口与迁移风险判断
+
+*
+
+### 6.3 需要外部确认的事项
 
 *
 
 ---
 
-## 3. 综述思路与组织角度（review logic and organizing perspective）
+## 7. 借鉴视角与英文素材（transferable insights and English-ready material）
 
-说明作者主要按什么维度组织领域：
-
-* method
-* task
-* modality
-* interaction flow
-* evaluation
-* application scenario
-* theoretical framework
-
-证据：
-
-* （文件名：xxx.pdf，第 x 页）
-
-我的判断：
+### 7.1 对用户研究可借鉴之处
 
 *
 
----
-
-## 4. 研究体系或分类框架（research taxonomy / classification framework）
-
-| Category | Definition | Representative works | Key limitation |
-| -------- | ---------- | -------------------- | -------------- |
-|          |            |                      |                |
-
-压缩判断：
-
-* taxonomy 是否清晰：
-* 是否适合借鉴：
-* 是否可能遗漏：
-
----
-
-## 5. Scope-taxonomy 检查（scope-taxonomy alignment）
-
-| Survey claim / scope decision | Evidence            | Strength                           | What it covers | What may be missing |
-| ----------------------------- | ------------------- | ---------------------------------- | -------------- | ------------------- |
-|                               | （文件名：xxx.pdf，第 x 页） | strong / moderate / weak / unclear |                |                     |
-
-compact report 至少检查 2–3 个关键 scope / taxonomy decision。
-
----
-
-## 6. 该领域当前挑战（current challenges）
-
-| Challenge | Description | Evidence            | Relation to user research |
-| --------- | ----------- | ------------------- | ------------------------- |
-|           |             | （文件名：xxx.pdf，第 x 页） |                           |
-
----
-
-## 7. 未来研究方向（future research directions）
-
-| Direction | Paper-proposed or inferred? | Evidence            | Usefulness |
-| --------- | --------------------------- | ------------------- | ---------- |
-|           | paper-proposed / inferred   | （文件名：xxx.pdf，第 x 页） |            |
-
----
-
-## 8. 压缩外部检索判断（compressed external-tracing notes）
-
-### 8.1 与相邻综述的关系（compressed adjacent-survey note）
-
-保留一句判断：
-
-> 该综述相对已有综述的主要差异在于……；但该判断仍需进一步检索相邻综述确认。
-
-如已进行轻量候选检索，可填：
-
-| Survey | Year | Difference | Confidence                                  |
-| ------ | ---: | ---------- | ------------------------------------------- |
-|        |      |            | confirmed / likely / candidate / unverified |
-
-### 8.2 作者后续工作与 future directions 对照（compressed author-follow-up note）
-
-保留一句判断：
-
-> 作者后续工作需要外部检索确认；当前不能可靠判断其是否回应了综述中的 future directions。
-
-如已有线索，可填：
-
-| Work | Year | Relation to future direction | Confidence                                  |
-| ---- | ---: | ---------------------------- | ------------------------------------------- |
-|      |      |                              | confirmed / likely / candidate / unverified |
-
----
-
-## 9. 讨论与不足（discussion and limitations）
-
-### 9.1 作者承认的局限
+### 7.2 不适合直接照搬之处
 
 *
 
-### 9.2 我的补充判断
-
-保留 2–3 个最关键不足：
-
-1.
-2.
-3.
-
----
-
-## 10. 借鉴视角：对用户研究的可借鉴之处（transferable insights）
-
-### 10.1 可借鉴的综述组织方式
+### 7.3 可转化的后续问题
 
 *
 
-### 10.2 可借鉴的分类维度
-
-*
-
-### 10.3 可借鉴的挑战或未来方向表述
-
-*
-
-### 10.4 不适合直接照搬的地方
-
-*
-
----
-
-## 11. 压缩英文素材（compact English-ready material）
-
-### 11.1 Key terms
+### 7.4 Key terms
 
 | 中文术语 | English term |
-| ---- | ------------ |
-|      |              |
+| -------- | ------------ |
+|          |              |
 
-### 11.2 One-slide takeaway
+### 7.5 One-slide takeaway
 
 *
 *

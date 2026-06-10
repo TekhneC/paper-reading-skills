@@ -2,7 +2,7 @@
 
 name: single-paper-deep-read
 description: Use this skill for an approved formal deep reading of one research paper or survey paper. It determines paper_type and report_mode separately, supports research-article and survey-article templates, applies metrics-first analysis for research articles, scope-taxonomy-first analysis for surveys, handles classic/new research article strategies, checks claim-evidence or scope-taxonomy alignment, and produces Chinese reports with English terminology and English-ready takeaways. Do not use it for quick triage, daily queue ranking, or multi-paper synthesis.
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---
 
 # Single Paper Deep Read Skill
 
@@ -30,6 +30,8 @@ This skill is responsible for:
 10. distinguishing paper claims, supported inference, and critical judgment
 11. producing critical perspectives and transferable insights
 
+This skill/model, not a pure script, is responsible for producing the analytical deep-reading prose. Scripts may prepare source bundles, approval records, validation reports, daily indexes, external verification records, and state transitions, but scripts must not be treated as sufficient to produce the final deep-read interpretation by themselves.
+
 This skill must not perform:
 
 * quick triage
@@ -37,6 +39,7 @@ This skill must not perform:
 * full theme-based multi-paper synthesis
 * full team research tracing
 * full literature review writing
+* automatic deep-read prose generation without model reading and evidence judgment
 
 Related skills:
 
@@ -91,6 +94,28 @@ In particular:
 * Do not fabricate methods, equations, datasets, baselines, metrics, results, page numbers, lineage, or claims.
 
 Do not duplicate or override global Zotero, Git, state, or safety rules from `AGENTS.md`.
+
+---
+
+## 3.1 Repository path policy
+
+This skill may be invoked through a symlink under:
+
+```text
+~/.agents/skills/single-paper-deep-read
+```
+
+Do not assume the current working directory is the repository root.
+
+Resolve all repository-relative paths through:
+
+```text
+config/paths.toml
+```
+
+Use `[repository].root` as the canonical repository root. Resolve paths in `[state]`, `[outputs]`, `[templates]`, `[scripts]`, and `[skills]` relative to that root unless a path is absolute.
+
+If `config/paths.toml` is unavailable, fall back to the nearest ancestor directory containing `AGENTS.md`, `config/paths.toml`, and `skills/`.
 
 ---
 
@@ -539,6 +564,20 @@ It should answer:
 
 Do not expand complex method details in this section.
 
+When a reliable key figure is available, include a visual anchor in the first report section.
+
+Choose the most important:
+
+```text
+research article -> model architecture / method pipeline / system workflow
+survey article -> scope diagram / taxonomy overview / review framework
+default_or_unknown -> central process, framework, or scope figure
+```
+
+Prefer `state/cache/deep_read_sources/<paper_key>/figures.json` and rendered figure/page images. If no reliable key figure is available, state that the key visual anchor requires visual verification rather than inserting a decorative or weakly related figure.
+
+When `figures.json` provides both a full-page image and a cropped image, prefer `repo_relative_crop_image_path` for the Markdown image link. Fall back to the full-page image only when the crop is missing or visually misleading.
+
 ---
 
 ## 13. Metrics-first and scope-taxonomy-first rules
@@ -958,12 +997,12 @@ Use the appropriate template when available.
 Template paths:
 
 ```text
-templates/deep_read_research_full.md
-templates/deep_read_research_compact.md
-templates/deep_read_survey_full.md
-templates/deep_read_survey_compact.md
-templates/deep_read_default_full.md
-templates/deep_read_default_compact.md
+templates.deep_read_research_full -> templates/deep_read_research_full.md
+templates.deep_read_research_compact -> templates/deep_read_research_compact.md
+templates.deep_read_survey_full -> templates/deep_read_survey_full.md
+templates.deep_read_survey_compact -> templates/deep_read_survey_compact.md
+templates.deep_read_default_full -> templates/deep_read_default_full.md
+templates.deep_read_default_compact -> templates/deep_read_default_compact.md
 ```
 
 Selection rule:
@@ -990,11 +1029,29 @@ Do not mix templates unless the user explicitly requests a hybrid report.
 Use available inputs when present:
 
 ```text
+config/paths.toml
 state/library_index.jsonl
 state/reading_queue.json
 state/approvals/
+state/candidates/YYYY-MM-DD_deep_read_candidates.json
+outputs/daily/YYYY-MM-DD/deep_read_candidates.json
 outputs/papers/<paper_key>/quick_read.md
-config/paths.toml
+outputs/papers/<paper_key>/quick_read.json
+outputs/daily/YYYY-MM-DD/quick_reads/<paper_key>.md
+outputs/daily/YYYY-MM-DD/quick_reads/<paper_key>.json
+state/cache/quick_read_sources/<paper_key>.flow.txt
+state/cache/quick_read_sources/<paper_key>.layout.txt
+state/cache/quick_read_sources/<paper_key>.source.json
+state/cache/deep_read_sources/<paper_key>/pages.json
+state/cache/deep_read_sources/<paper_key>/tables.md
+state/cache/deep_read_sources/<paper_key>/figures.json
+state/cache/deep_read_sources/<paper_key>/figures/
+state/cache/deep_read_sources/<paper_key>/source.json
+state/external_verification/<paper_key>.json
+scripts/extract_quick_read_source.py
+scripts/extract_deep_read_source.py
+scripts/verify_external_evidence.py
+scripts/validate_workflow_outputs.py
 templates/deep_read_research_full.md
 templates/deep_read_research_compact.md
 templates/deep_read_survey_full.md
@@ -1002,6 +1059,21 @@ templates/deep_read_survey_compact.md
 templates/deep_read_default_full.md
 templates/deep_read_default_compact.md
 ```
+
+Input priority:
+
+1. current user request and explicit approval
+2. approval record in `state/approvals/`
+3. approved state record with `deep_read_approved`
+4. daily triage candidate confirmed by the user
+5. canonical quick-read outputs under `outputs/papers/<paper_key>/`
+6. current daily-run quick-read outputs under `outputs/daily/YYYY-MM-DD/quick_reads/`
+7. deep-read source cache under `state/cache/deep_read_sources/`
+8. quick-read source cache under `state/cache/quick_read_sources/`
+9. external verification records under `state/external_verification/`
+10. reading queue and Zotero metadata
+
+Candidate files such as `deep_read_candidates.json` are not approval by themselves. They only become approval when the user confirms the paper for deep reading or an approval/state record is written.
 
 A single paper may be identified by:
 
@@ -1023,12 +1095,49 @@ This skill may produce:
 
 ```text
 outputs/papers/<paper_key>/deep_read.md
+outputs/papers/<paper_key>/deep_read.json
+outputs/daily/YYYY-MM-DD/deep_reads/<paper_key>.md
+outputs/daily/YYYY-MM-DD/deep_reads/<paper_key>.json
 ```
 
 If `paper_key` is unavailable, use a safe slug based on the title:
 
 ```text
 outputs/papers/<title_slug>/deep_read.md
+outputs/papers/<title_slug>/deep_read.json
+outputs/daily/YYYY-MM-DD/deep_reads/<title_slug>.md
+outputs/daily/YYYY-MM-DD/deep_reads/<title_slug>.json
+```
+
+The paper directory is the canonical long-term location. The daily directory is the run view that shows which papers entered deep reading on that date.
+
+The JSON sidecar should be machine-readable and suitable for later `theme-coreading`.
+
+Minimum `deep_read.json` fields:
+
+```json
+{
+  "schema_version": "1.0",
+  "paper_key": "",
+  "title": "",
+  "paper_type": "research_article | survey_article | default_or_unknown",
+  "research_subtype": "classic_paper | new_paper | ordinary_research_article | not_applicable",
+  "report_mode": "full_report | compact_report",
+  "template_used": "",
+  "approval_source": "",
+  "source_paths": [],
+  "evidence_status": "",
+  "page_evidence_status": "",
+  "preprint_status": "",
+  "key_takeaway": "",
+  "key_figure_path": "",
+  "key_figure_caption": "",
+  "key_figure_page": null,
+  "key_figure_role": "",
+  "claim_evidence_summary": "",
+  "transferable_insights": [],
+  "generated_at": ""
+}
 ```
 
 This skill may propose a state update:
@@ -1068,6 +1177,9 @@ preprint_status if applicable
 pdf_path
 approval_source
 quick_read_path
+quick_read_json_path
+source_cache_paths
+daily_run_date if applicable
 selected_template
 ```
 
@@ -1116,6 +1228,25 @@ State the selected mode briefly if it is not obvious.
 
 If the paper is a preprint, submission, or unpublished manuscript, apply Section 8.
 
+Because publication and acceptance status can change, verify the latest status with the most authoritative available source when network or external search is available:
+
+```text
+publisher page
+official conference proceedings
+OpenReview
+arXiv version history
+DOI landing page
+project page or author page
+```
+
+If external verification is unavailable, mark the status as `status unknown` or `unverified` rather than inferring acceptance.
+
+When network access is available and the report depends on preprint status, adjacent surveys, author follow-up, or citing/follow-up work, perform or request external verification and record the result in:
+
+```text
+state/external_verification/<paper_key>.json
+```
+
 ### Step 6. Select template
 
 Select the matching template from Section 20.
@@ -1123,6 +1254,32 @@ Select the matching template from Section 20.
 ### Step 7. Read and extract evidence
 
 Extract evidence according to paper_type and report_mode.
+
+Use the strongest available source first:
+
+1. original PDF or full text
+2. `state/cache/deep_read_sources/<paper_key>/pages.json`
+3. `state/cache/deep_read_sources/<paper_key>/tables.md`
+4. `state/cache/deep_read_sources/<paper_key>/figures.json` and figure images
+5. page-aware or layout-aware extraction if available
+6. `state/cache/quick_read_sources/<paper_key>.layout.txt`
+7. `state/cache/quick_read_sources/<paper_key>.flow.txt`
+8. `outputs/papers/<paper_key>/quick_read.json`
+9. `outputs/papers/<paper_key>/quick_read.md`
+10. Zotero metadata and reading queue metadata
+
+Do not rely on quick-read outputs alone for a formal deep read unless the user explicitly accepts an evidence-limited report.
+
+For two-column PDFs, tables, figures, equations, or extraction artifacts:
+
+1. prefer layout-aware text over flow text when column order matters
+2. inspect table/figure captions and surrounding paragraphs before interpreting results
+3. use extracted figure images when a figure is central to the claim or method explanation
+4. if a table or figure is central to the claim but extraction is unreliable, state that it requires page-level or visual inspection
+5. do not reconstruct numeric results from garbled table text
+6. mark page numbers as unreliable when the extraction source cannot preserve pages
+
+For the first report section, select at most one key visual anchor. Do not include every detected figure there. Additional figures may be discussed later only when they support a specific claim.
 
 For research articles, prioritize:
 
@@ -1193,82 +1350,86 @@ unless the user asks for oral material.
 
 ## 24. Required report sections
 
+Templates should reduce reader pressure by grouping detailed checks into 7-8 major report sections. Do not expand a deep-read report into many small top-level sections unless the user explicitly asks.
+
+Metadata is required but does not count as a report section.
+
 ### 24.1 Research article full report
 
-Must include:
+Must include 8 major sections:
 
-1. 核心结论先行（executive takeaway）
-2. 研究动机（research motivation）
-3. 研究思路（research idea）
-4. 评估指标（evaluation metrics）
-5. 研究方法（research method）
-6. 实验设置与结果（experimental setup and results）
-7. Claim-evidence 检查（claim-evidence alignment）
-8. 讨论与不足（discussion and limitations）
-9. 谱系追踪（lineage tracing）
-10. 团队研究线索（lightweight team research tracing）
-11. 思辨视角一：审稿人视角的潜在不足（reviewer-style weaknesses）
-12. 思辨视角二：同行研究者视角的后续研究方向（peer-researcher follow-up directions）
-13. 借鉴视角：对用户研究的可借鉴之处（transferable insights）
-14. 英文写作与 oral 可用素材（English-ready takeaways）
+1. ??????????executive takeaway?
+2. ???????????problem, motivation, and central idea?
+3. ??????????evaluation metrics and evidence design?
+4. ??????????method, mechanism, and results?
+5. Claim-evidence ??????alignment, discussion, and limitations?
+6. ?????????????lineage, team signals, and verification?
+7. ??????????????transferable insights and follow-up directions?
+8. ????? oral ?????English-ready takeaways?
 
 ### 24.2 Research article compact report
 
-Must include:
+Must include 7 major sections:
 
-1. 核心结论先行（executive takeaway）
-2. 研究动机（research motivation）
-3. 研究思路（research idea）
-4. 评估指标（evaluation metrics）
-5. 研究方法（research method）
-6. 实验设置与结果（experimental setup and results）
-7. Claim-evidence 检查（claim-evidence alignment）
-8. 讨论与不足（discussion and limitations）
-9. 借鉴视角：对用户研究的可借鉴之处（transferable insights）
+1. ??????????executive takeaway?
+2. ???????????problem, motivation, and idea?
+3. ??????????evaluation metrics and evidence design?
+4. ??????????method and results?
+5. Claim-evidence ??????alignment and limitations?
+6. ?????????????lineage and verification?
+7. ??????????transferable insights and English-ready material?
+
+Compact deep read is still a deep-read report. It may compress tables and explanatory prose, but it must preserve metrics-first reasoning, evidence judgment, limitations, and transferable insights.
 
 ### 24.3 Survey article full report
 
-Must include:
+Must include 8 major sections:
 
-1. 核心结论先行（executive takeaway）
-2. 综述范围（survey scope）
-3. 纳入与排除边界（inclusion and exclusion boundary）
-4. 与相邻综述的关系（relation to adjacent surveys）
-5. 综述思路与组织角度（review logic and organizing perspective）
-6. 研究体系或分类框架（research taxonomy / classification framework）
-7. 按分类框架梳理综述内容（content synthesis by taxonomy）
-8. Scope-taxonomy 检查（scope-taxonomy alignment）
-9. 该领域当前挑战（current challenges）
-10. 未来研究方向（future research directions）
-11. 作者后续工作与综述未来方向的对照（author follow-up works vs. proposed future directions）
-12. 讨论与不足（discussion and limitations）
-13. 思辨视角一：审稿人视角的潜在不足（reviewer-style weaknesses）
-14. 思辨视角二：同行研究者视角的后续研究方向（peer-researcher follow-up directions）
-15. 借鉴视角：对用户研究的可借鉴之处（transferable insights）
-16. 英文写作与 oral 可用素材（English-ready takeaways）
+1. ??????????executive takeaway and scope positioning?
+2. ???????????scope, boundary, and adjacent surveys?
+3. ??????????review logic and taxonomy?
+4. ??????????content synthesis by taxonomy?
+5. Scope-taxonomy ???????????alignment, challenges, and future directions?
+6. ?????????????author follow-up, verification, and limitations?
+7. ??????????????transferable insights and follow-up questions?
+8. ????? oral ?????English-ready takeaways?
 
 ### 24.4 Survey article compact report
 
-Must include:
+Must include 7 major sections:
 
-1. 核心结论先行（executive takeaway）
-2. 综述范围（survey scope）
-3. 纳入与排除边界（inclusion and exclusion boundary）
-4. 综述思路与组织角度（review logic and organizing perspective）
-5. 研究体系或分类框架（research taxonomy / classification framework）
-6. Scope-taxonomy 检查（scope-taxonomy alignment）
-7. 该领域当前挑战（current challenges）
-8. 未来研究方向（future research directions）
-9. 讨论与不足（discussion and limitations）
-10. 借鉴视角：对用户研究的可借鉴之处（transferable insights）
+1. ??????????executive takeaway and scope?
+2. ???????????scope, boundary, and adjacent surveys?
+3. ??????????review logic and taxonomy?
+4. ??????????content synthesis?
+5. Scope-taxonomy ???????????alignment, challenges, and directions?
+6. ?????????????limitations and verification?
+7. ??????????transferable insights and English-ready material?
 
 ### 24.5 Default full report
 
-Must include the closest appropriate full-report structure.
+Must include 8 major sections:
+
+1. ??????????type decision and executive takeaway?
+2. ???????????problem, scope, and organizing perspective?
+3. ???????????evaluation, evidence, or classification standard?
+4. ?????????????method, content, or argument structure?
+5. Alignment ??????alignment and limitations?
+6. ???????????????related work, author signals, and verification?
+7. ??????????????transferable insights and follow-up directions?
+8. ????? oral ?????English-ready takeaways?
 
 ### 24.6 Default compact report
 
-Must include the closest appropriate compact-report structure.
+Must include 7 major sections:
+
+1. ??????????type decision and executive takeaway?
+2. ???????????problem, scope, and organizing perspective?
+3. ???????????evaluation, evidence, or classification standard?
+4. ?????????????method, content, or argument?
+5. Alignment ??????alignment and limitations?
+6. ??????????external notes and verification?
+7. ??????????transferable insights and English-ready material?
 
 ---
 
@@ -1286,6 +1447,20 @@ figures and tables available
 references available
 appendix available if relevant
 ```
+
+Evidence source hierarchy:
+
+```text
+original PDF or page-aware source
+layout-aware extracted text
+flow extracted text
+quick_read.json
+quick_read.md
+Zotero metadata
+reading_queue.json
+```
+
+For deep reading, metadata, abstracts, and quick-read summaries are supporting context, not sufficient evidence by themselves.
 
 If only metadata or abstract is available, do not produce a formal deep-reading report.
 
@@ -1317,6 +1492,12 @@ If page numbers cannot be reliably extracted, write:
 页码未能可靠识别。
 ```
 
+If table, figure, equation, or appendix evidence is needed but the extraction is unreliable, write:
+
+```text
+该证据需要页面级或图像级复核；当前文本抽取不足以可靠还原表格、图或公式。
+```
+
 Distinguish:
 
 ```text
@@ -1335,13 +1516,26 @@ This skill may propose or apply the following state update:
 deep_read_approved -> deep_read_done
 ```
 
+Candidate and approval lifecycle:
+
+```text
+deep_read_candidate -> deep_read_approved -> deep_read_done
+```
+
+`deep_read_candidate` means the paper was recommended or shortlisted. It is not enough to start formal deep reading.
+
+`deep_read_approved` means the user or state record has approved deep reading.
+
+`deep_read_done` means both the Markdown report and JSON sidecar were generated successfully.
+
 Apply the update only when:
 
 1. the state file exists
 2. the paper is approved for deep reading
-3. the deep-reading report has actually been generated
-4. the transition is allowed by `AGENTS.md`
-5. the user request allows writing state
+3. the deep-reading Markdown report has actually been generated
+4. the deep-reading JSON sidecar has actually been generated
+5. the transition is allowed by `AGENTS.md`
+6. the user request allows writing state
 
 Do not archive papers automatically.
 
