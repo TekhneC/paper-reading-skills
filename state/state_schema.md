@@ -484,7 +484,13 @@ default_or_unknown -> central process, framework, or scope figure
 
 If no reliable key figure is available, the report should say that visual verification is needed instead of embedding an arbitrary figure.
 
-When both full-page and cropped figure images are available, prefer `repo_relative_crop_image_path` for Markdown embedding. Use the full-page image only when the crop is missing, incorrect, or visually misleading.
+When both full-page and cropped figure images are available, prefer the absolute local `crop_image_path` for Markdown embedding, wrapped in angle brackets:
+
+```markdown
+![Key figure: <short description>](<C:\absolute\path\to\figure_crop.png>)
+```
+
+Use absolute local `image_path` only when the crop is missing, incorrect, or visually misleading. Use `repo_relative_crop_image_path` or `repo_relative_image_path` only when portable repository-relative Markdown is explicitly requested.
 
 Recommended `tables.md` format:
 

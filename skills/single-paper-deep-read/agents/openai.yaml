@@ -1,0 +1,7 @@
+interface:
+  display_name: "Single Paper Deep Read"
+  short_description: "Produce approved evidence-grounded deep-read reports"
+  default_prompt: "Use $single-paper-deep-read to create an approved formal deep-read report for this paper."
+
+policy:
+  allow_implicit_invocation: true

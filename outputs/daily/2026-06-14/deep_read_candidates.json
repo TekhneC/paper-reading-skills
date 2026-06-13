@@ -23,6 +23,27 @@
       "risk_or_uncertainty": "Exact quantitative table values, ablation contributions, computational overhead, consistency metrics, and failure cases require formal deep reading.",
       "evidence_source": "outputs/papers/L73225HI/quick_read.json; outputs/papers/L73225HI/quick_read.md",
       "evidence_location": "PDF text cache, no reliable page map",
+      "qualitative_ratings": {
+        "research_fit": "high",
+        "literature_review_value": "high",
+        "task_formulation": "high",
+        "method_mechanism": "high",
+        "evaluation_metrics": "medium",
+        "baseline_comparison": "high",
+        "ablation_logic": "medium",
+        "process_interaction_relevance": "high",
+        "novel_framing": "high",
+        "evidence_confidence": "medium"
+      },
+      "high_rated_dimensions": [
+        "research_fit",
+        "literature_review_value",
+        "task_formulation",
+        "method_mechanism",
+        "baseline_comparison",
+        "process_interaction_relevance",
+        "novel_framing"
+      ],
       "approval_status": "deep_read_done",
       "approval_record": "state/approvals/L73225HI.json",
       "deep_read_report": "outputs/papers/L73225HI/deep_read.md",
@@ -45,6 +66,25 @@
       "risk_or_uncertainty": "Benchmark construction, personality update mechanism, ablation logic, full baseline tables, and ecological validity require formal deep reading.",
       "evidence_source": "outputs/papers/RZVWJTDS/quick_read.json; outputs/papers/RZVWJTDS/quick_read.md",
       "evidence_location": "PDF text cache, no reliable page map",
+      "qualitative_ratings": {
+        "research_fit": "medium",
+        "literature_review_value": "high",
+        "task_formulation": "high",
+        "method_mechanism": "medium",
+        "evaluation_metrics": "high",
+        "baseline_comparison": "medium",
+        "ablation_logic": "unknown",
+        "process_interaction_relevance": "high",
+        "novel_framing": "high",
+        "evidence_confidence": "medium"
+      },
+      "high_rated_dimensions": [
+        "literature_review_value",
+        "task_formulation",
+        "evaluation_metrics",
+        "process_interaction_relevance",
+        "novel_framing"
+      ],
       "approval_status": "deep_read_done",
       "approval_record": "state/approvals/RZVWJTDS.json",
       "deep_read_report": "outputs/papers/RZVWJTDS/deep_read.md",

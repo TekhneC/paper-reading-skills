@@ -1,0 +1,7 @@
+interface:
+  display_name: "Daily Paper Triage"
+  short_description: "Aggregate quick reads and rank deep-read candidates"
+  default_prompt: "Use $daily-paper-triage to build today's paper reading digest and recommend deep-read candidates."
+
+policy:
+  allow_implicit_invocation: true

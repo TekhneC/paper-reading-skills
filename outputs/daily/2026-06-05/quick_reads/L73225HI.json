@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "paper_key": "L73225HI",
+  "title": "Memory-V2V: Memory-Augmented Video-to-Video Diffusion for Consistent Multi-Turn Editing",
+  "evidence_status": "pdf_text_cache_available",
+  "recommended_action": "deep_read_candidate",
+  "decision_label": "strong_candidate",
+  "suggested_deep_read_focus": [
+    "task_formulation",
+    "method_mechanism",
+    "evaluation_metrics",
+    "baseline_design",
+    "ablation_logic",
+    "process_representation"
+  ],
+  "evidence_source": "state/cache/quick_read_sources/L73225HI.flow.txt; state/cache/quick_read_sources/L73225HI.layout.txt",
+  "evidence_location": "PDF text cache, no reliable page map",
+  "qualitative_ratings": {
+    "research_fit": "high",
+    "literature_review_value": "high",
+    "task_formulation": "high",
+    "method_mechanism": "high",
+    "evaluation_metrics": "medium",
+    "baseline_comparison": "high",
+    "ablation_logic": "medium",
+    "process_interaction_relevance": "high",
+    "novel_framing": "high",
+    "evidence_confidence": "medium"
+  },
+  "high_rated_dimensions": [
+    {
+      "dimension": "research_fit",
+      "reason": "The paper directly studies iterative generative editing and cross-turn consistency, which is close to process-level generation and editing workflows."
+    },
+    {
+      "dimension": "task_formulation",
+      "reason": "It explicitly formulates multi-turn video editing as a distinct setting where prior edits constrain later generations."
+    },
+    {
+      "dimension": "method_mechanism",
+      "reason": "The method combines task-aware retrieval, dynamic tokenization, and adaptive token merging to use memory without linear context growth."
+    },
+    {
+      "dimension": "baseline_comparison",
+      "reason": "The paper positions itself against ReCamMaster, LucyEdit, and long-video memory/context methods."
+    },
+    {
+      "dimension": "process_interaction_relevance",
+      "reason": "The paper treats editing as a multi-turn process rather than a single isolated generation."
+    },
+    {
+      "dimension": "novel_framing",
+      "reason": "It reframes memory in video editing as structured constraints across independently denoised edits."
+    }
+  ],
+  "risk_or_uncertainty": "Quick-read relies on extracted text; exact quantitative table values and ablation details require layout/table verification or deep reading.",
+  "generated_at": "2026-06-05T00:00:00+08:00"
+}

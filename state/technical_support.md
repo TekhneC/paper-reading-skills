@@ -53,7 +53,8 @@ Figure extraction policy:
 * Render candidate pages as PNG when embedded figure extraction is insufficient.
 * Use bounding-box text extraction to crop the key figure region when possible.
 * Mark the best candidate as `key_figure_candidate` in `figures.json`.
-* Prefer `repo_relative_crop_image_path` in Markdown when a report embeds a visual anchor.
+* Prefer absolute local `crop_image_path` in Markdown when a report embeds a visual anchor; wrap the path in angle brackets.
+* Use `repo_relative_crop_image_path` only when portable repository-relative Markdown is explicitly requested.
 * If extraction is unreliable, mark the figure as needing visual verification.
 
 The original Zotero PDF must remain unchanged.

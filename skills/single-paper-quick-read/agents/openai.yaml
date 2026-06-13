@@ -1,0 +1,7 @@
+interface:
+  display_name: "Single Paper Quick Read"
+  short_description: "Create concise evidence-based paper triage cards"
+  default_prompt: "Use $single-paper-quick-read to produce a quick-read card and triage decision for this paper."
+
+policy:
+  allow_implicit_invocation: true

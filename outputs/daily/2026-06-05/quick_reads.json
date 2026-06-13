@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "date": "2026-06-05",
+  "canonical_outputs_dir": "outputs/papers",
+  "quick_reads": [
+    {
+      "paper_key": "L73225HI",
+      "title": "Memory-V2V: Memory-Augmented Video-to-Video Diffusion for Consistent Multi-Turn Editing",
+      "recommended_action": "deep_read_candidate",
+      "decision_label": "strong_candidate",
+      "daily_markdown": "outputs/daily/2026-06-05/quick_reads/L73225HI.md",
+      "daily_json": "outputs/daily/2026-06-05/quick_reads/L73225HI.json",
+      "canonical_markdown": "outputs/papers/L73225HI/quick_read.md",
+      "canonical_json": "outputs/papers/L73225HI/quick_read.json"
+    },
+    {
+      "paper_key": "RZVWJTDS",
+      "title": "PersonaVLM: Long-Term Personalized Multimodal LLMs",
+      "recommended_action": "deep_read_candidate",
+      "decision_label": "candidate",
+      "daily_markdown": "outputs/daily/2026-06-05/quick_reads/RZVWJTDS.md",
+      "daily_json": "outputs/daily/2026-06-05/quick_reads/RZVWJTDS.json",
+      "canonical_markdown": "outputs/papers/RZVWJTDS/quick_read.md",
+      "canonical_json": "outputs/papers/RZVWJTDS/quick_read.json"
+    }
+  ]
+}
