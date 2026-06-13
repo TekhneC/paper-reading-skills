@@ -2,64 +2,39 @@
 
 This document records workflow-support components for the paper-reading skills.
 
-The scripts below support the skills, but they do not replace model reading, evidence judgment, or analytical report writing.
+Scripts support the skills, but they do not replace model reading, evidence judgment, or analytical report writing.
 
-## Deep-read responsibility boundary
+## Responsibility Boundary
 
-Deep-read Markdown is produced by the `single-paper-deep-read` skill/model using the selected template.
+Markdown reports are produced by the relevant skill/model using the selected template.
 
 Scripts may:
 
 * prepare source bundles
-* convert approved candidates into approval records
+* create or restore workflow files from templates
 * validate JSON/Markdown outputs
-* update state with guarded transitions
-* build daily indexes
+* apply guarded state transitions
+* write explicit approval records
+* build lightweight indexes
 * record external verification evidence
 
-Scripts must not be treated as the sole producer of formal deep-reading prose.
+Scripts must not be treated as the sole producer of analytical reading prose.
 
-## Planned script contracts
+## Existing Scripts
 
-### `scripts/approve_deep_read_candidate.py`
+These scripts already exist and may be referenced from `config/paths.toml`.
 
-Purpose: convert a pending deep-read candidate into an explicit approval record.
+### `scripts/build_reading_queue_from_zotero_todo.py`
 
-Inputs:
+Builds `state/reading_queue.json` from a read-only Zotero tag query.
 
-```text
---paper-key <paper_key>
---candidate-file state/candidates/YYYY-MM-DD_deep_read_candidates.json
---approver <name>
---approval-reason <text>
---report-mode full_report | compact_report
---approved-focus <text>
-```
+### `scripts/extract_quick_read_source.py`
 
-Outputs:
-
-```text
-state/approvals/<paper_key>.json
-```
-
-Side effects:
-
-* May update `state/processed_papers.json` from `deep_read_candidate` to `deep_read_approved`.
-* Must not approve a paper absent from the candidate file unless the current user request explicitly approves that paper.
+Builds quick-read source bundles from Zotero metadata, PDF attachments, and `pdftotext` extraction.
 
 ### `scripts/extract_deep_read_source.py`
 
-Purpose: build page-level and visual evidence bundles for formal deep reading.
-
-Inputs:
-
-```text
-<paper_key>
---config config/paths.toml
---include-pages
---include-tables
---include-figures
-```
+Builds page-level and visual evidence bundles for formal deep reading.
 
 Outputs:
 
@@ -75,43 +50,46 @@ Figure extraction policy:
 
 * Detect figure captions from page-level layout text.
 * Prefer captions mentioning model, framework, architecture, pipeline, workflow, process, scope, taxonomy, or overview.
-* Render candidate pages as PNG when embedded figure extraction is insufficient, because model/scope diagrams are often vector graphics.
+* Render candidate pages as PNG when embedded figure extraction is insufficient.
 * Use bounding-box text extraction to crop the key figure region when possible.
 * Mark the best candidate as `key_figure_candidate` in `figures.json`.
-* The deep-read report may embed this candidate in Section 1 as the visual anchor.
-* Prefer `repo_relative_crop_image_path` in Markdown. Fall back to the rendered full page only when crop extraction fails.
+* Prefer `repo_relative_crop_image_path` in Markdown when a report embeds a visual anchor.
 * If extraction is unreliable, mark the figure as needing visual verification.
 
 The original Zotero PDF must remain unchanged.
 
-### `scripts/validate_workflow_outputs.py`
+## Planned Consolidated Scripts
 
-Purpose: validate outputs from all paper-reading skills.
+Do not add separate scripts for approval, validation, state update, daily indexing, and external-verification record writing unless the combined interface becomes too large. Prefer the two consolidated scripts below.
 
-Inputs:
+### `scripts/workflow_state.py`
+
+Purpose: one guarded entry point for workflow state, approvals, validation, and lightweight indexes.
+
+Recommended subcommands:
 
 ```text
---target reading_queue | quick_read | daily_triage | approval | deep_read | daily_deep_reads | all
---paper-key <paper_key>
---date YYYY-MM-DD
---config config/paths.toml
+validate
+transition
+approve-deep-read
+build-daily-deep-read-index
+record-external-verification
 ```
 
-Checks:
+`validate` checks:
 
-* required fields exist
-* paired Markdown/JSON files agree on `paper_key`
-* referenced source files exist when required
-* status values are known
-* state transitions are allowed
-* approval exists before `deep_read_done`
-* external verification status is explicit
+```text
+required fields exist
+paired Markdown/JSON files agree on paper_key
+referenced files exist when required
+status values are known
+state transitions are allowed
+approval exists before deep_read_done
+external verification status is explicit
+theme state, comparison matrix, and synthesis files exist when required
+```
 
-### `scripts/update_paper_state.py`
-
-Purpose: apply guarded workflow state transitions.
-
-Inputs:
+`transition` applies guarded state transitions:
 
 ```text
 --paper-key <paper_key>
@@ -121,43 +99,69 @@ Inputs:
 --notes <text>
 ```
 
-Allowed transitions are defined in `state/state_schema.md`.
+Allowed transitions are defined in `state/state_schema.md`. The command must reject unexpected transitions by default.
 
-The script must reject unexpected transitions by default.
-
-### `scripts/build_daily_deep_reads_index.py`
-
-Purpose: build a date-oriented index of completed deep reads.
-
-Inputs:
+`approve-deep-read` creates:
 
 ```text
---date YYYY-MM-DD
---config config/paths.toml
+state/approvals/<paper_key>.json
 ```
 
-Output:
+It should not directly update `state/processed_papers.json`; use `transition` for that.
+
+`build-daily-deep-read-index` creates:
 
 ```text
 outputs/daily/YYYY-MM-DD/deep_reads.json
 ```
 
-### `scripts/verify_external_evidence.py`
-
-Purpose: record network-based verification for publication status, adjacent surveys, author follow-up work, and related/citing works.
-
-Inputs:
-
-```text
---paper-key <paper_key>
---query-type preprint_status | adjacent_surveys | author_followup | related_work | citing_work
---config config/paths.toml
-```
-
-Output:
+`record-external-verification` writes externally checked evidence to:
 
 ```text
 state/external_verification/<paper_key>.json
 ```
 
 Network-backed findings must include source URLs and confidence labels. If network access is unavailable, write an explicit `unverified` or `skipped` status.
+
+### `scripts/theme_session.py`
+
+Purpose: support `theme-coreading` without turning synthesis into a script-generated report.
+
+Recommended subcommands:
+
+```text
+init
+restore
+collect-inputs
+validate
+```
+
+`init` creates:
+
+```text
+outputs/themes/<theme_id>/theme_state.md
+outputs/themes/<theme_id>/comparison_matrix.md
+outputs/themes/<theme_id>/synthesis_report.md
+```
+
+from:
+
+```text
+templates/theme_state.md
+templates/comparison_matrix.md
+templates/theme_synthesis.md
+```
+
+`restore` reports existing theme files and their last modified times.
+
+`collect-inputs` gathers available quick-read and deep-read outputs for a paper set, but does not synthesize claims.
+
+`validate` checks:
+
+```text
+theme_id is present
+research_question_status is known
+comparison_matrix.md exists when synthesis_report.md references it
+synthesis_report.md does not proceed from an unapproved provisional question
+evidence status and confidence fields are explicit
+```

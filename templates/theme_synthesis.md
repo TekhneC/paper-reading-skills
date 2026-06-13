@@ -19,6 +19,12 @@
 
 ---
 
+## Scope note
+
+This synthesis is a theme-level co-reading report for analysis, planning, and writing support. It is not a final publishable literature-review section unless the user explicitly asks for that output.
+
+---
+
 ## 0. 核心结论先行（executive takeaway）
 
 用 3–5 句话概括本轮主题共读的核心抓手：

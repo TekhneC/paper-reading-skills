@@ -34,16 +34,14 @@ deep_read_survey_full = "templates/deep_read_survey_full.md"
 deep_read_survey_compact = "templates/deep_read_survey_compact.md"
 deep_read_default_full = "templates/deep_read_default_full.md"
 deep_read_default_compact = "templates/deep_read_default_compact.md"
+theme_state = "templates/theme_state.md"
+comparison_matrix = "templates/comparison_matrix.md"
+theme_synthesis = "templates/theme_synthesis.md"
 
 [scripts]
 build_reading_queue_from_zotero_todo = "scripts/build_reading_queue_from_zotero_todo.py"
 extract_quick_read_source = "scripts/extract_quick_read_source.py"
-approve_deep_read_candidate = "scripts/approve_deep_read_candidate.py"
 extract_deep_read_source = "scripts/extract_deep_read_source.py"
-validate_workflow_outputs = "scripts/validate_workflow_outputs.py"
-update_paper_state = "scripts/update_paper_state.py"
-build_daily_deep_reads_index = "scripts/build_daily_deep_reads_index.py"
-verify_external_evidence = "scripts/verify_external_evidence.py"
 
 [pdf]
 pdftotext_path = "C:/texlive/2025/bin/windows/pdftotext.exe"

@@ -1,6 +1,7 @@
-state/cache/
-state/tmp/
 /outputs/
+/state/
+__pycache__/
+*.pyc
 *.sqlite
 *.sqlite-bak
 *.bak

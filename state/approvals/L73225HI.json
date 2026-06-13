@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "paper_key": "L73225HI",
+  "title": "Memory-V2V: Memory-Augmented Video-to-Video Diffusion for Consistent Multi-Turn Editing",
+  "approval_status": "deep_read_approved",
+  "approval_source": "user_confirmation",
+  "approved_at": "2026-06-14T00:00:00+08:00",
+  "approver": "user",
+  "source_candidate_file": "state/candidates/2026-06-14_deep_read_candidates.json",
+  "approved_focus": "task formulation; method mechanism; evaluation metrics; baseline design; ablation logic; process representation",
+  "report_mode": "full_report",
+  "notes": "User confirmed that both daily-triage candidates are suitable for deep reading."
+}

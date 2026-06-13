@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "date": "2026-06-14",
+  "generated_at": "2026-06-14T00:00:00+08:00",
+  "source": "daily-paper-triage",
+  "approval_status": "pending_user_confirmation",
+  "candidate_count": 2,
+  "candidates": [
+    {
+      "rank": 1,
+      "paper_key": "L73225HI",
+      "title": "Memory-V2V: Memory-Augmented Video-to-Video Diffusion for Consistent Multi-Turn Editing",
+      "decision_label": "strong_candidate",
+      "recommendation_reason": "Directly studies iterative generative editing and cross-turn consistency, close to process-level generation and creative editing workflows.",
+      "suggested_deep_read_focus": [
+        "task_formulation",
+        "method_mechanism",
+        "evaluation_metrics",
+        "baseline_design",
+        "ablation_logic",
+        "process_representation"
+      ],
+      "risk_or_uncertainty": "Exact quantitative table values, ablation contributions, computational overhead, consistency metrics, and failure cases require formal deep reading.",
+      "evidence_source": "outputs/papers/L73225HI/quick_read.json; outputs/papers/L73225HI/quick_read.md",
+      "evidence_location": "PDF text cache, no reliable page map",
+      "approval_status": "pending"
+    },
+    {
+      "rank": 2,
+      "paper_key": "RZVWJTDS",
+      "title": "PersonaVLM: Long-Term Personalized Multimodal LLMs",
+      "decision_label": "candidate",
+      "recommendation_reason": "Useful for long-term personalization, memory, interaction design, and evaluation dimensions in personalized multimodal agents.",
+      "suggested_deep_read_focus": [
+        "task_formulation",
+        "method_mechanism",
+        "evaluation_metrics",
+        "process_representation",
+        "interaction_design",
+        "ecological_validity"
+      ],
+      "risk_or_uncertainty": "Benchmark construction, personality update mechanism, ablation logic, full baseline tables, and ecological validity require formal deep reading.",
+      "evidence_source": "outputs/papers/RZVWJTDS/quick_read.json; outputs/papers/RZVWJTDS/quick_read.md",
+      "evidence_location": "PDF text cache, no reliable page map",
+      "approval_status": "pending"
+    }
+  ]
+}

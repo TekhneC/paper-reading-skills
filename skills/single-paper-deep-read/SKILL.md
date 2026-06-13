@@ -1052,8 +1052,7 @@ state/cache/deep_read_sources/<paper_key>/source.json
 state/external_verification/<paper_key>.json
 scripts/extract_quick_read_source.py
 scripts/extract_deep_read_source.py
-scripts/verify_external_evidence.py
-scripts/validate_workflow_outputs.py
+state/technical_support.md
 templates/deep_read_research_full.md
 templates/deep_read_research_compact.md
 templates/deep_read_survey_full.md

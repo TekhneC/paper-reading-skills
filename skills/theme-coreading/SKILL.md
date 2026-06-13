@@ -1,14 +1,7 @@
 ---
-
-name: theme-coreading
-description: Use this skill for interactive theme-based co-reading of multiple papers. It supports literature-review writing, research design, and new-topic understanding by maintaining a user-confirmed theme, user-confirmed research question, paper roles, comparison dimensions, field lineage tracing, supplementary reading recommendations, quick/deep read handoffs, interaction logs, and evolving synthesis reports. Do not use it for single-paper quick read, single-paper deep read, daily triage, or final literature-review writing.
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
----
-
 name: theme-coreading
 description: Use this skill for interactive theme-based co-reading of multiple papers. It supports literature-review writing, research design, and new-topic understanding by maintaining a user-controlled theme and research question, a persistent theme state, a comparison matrix, field lineage tracing, supplementary reading recommendations, quick/deep read handoffs, and an evolving synthesis report. Do not use it for single-paper quick read, single-paper deep read, daily triage, or final literature-review writing.
---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---
 
 # Theme Co-reading Skill
 
@@ -1088,7 +1081,7 @@ outputs/themes/<theme_id>/synthesis_report.md
 Only after:
 
 1. theme is clear
-2. research question is confirmed or explicitly marked provisional
+2. research question is confirmed or explicitly user-approved as provisional
 3. paper roles are labeled
 4. comparison dimensions are defined
 5. evidence status is stated

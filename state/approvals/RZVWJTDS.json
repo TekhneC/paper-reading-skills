@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "paper_key": "RZVWJTDS",
+  "title": "PersonaVLM: Long-Term Personalized Multimodal LLMs",
+  "approval_status": "deep_read_approved",
+  "approval_source": "user_confirmation",
+  "approved_at": "2026-06-14T00:00:00+08:00",
+  "approver": "user",
+  "source_candidate_file": "state/candidates/2026-06-14_deep_read_candidates.json",
+  "approved_focus": "task formulation; method mechanism; evaluation metrics; process representation; interaction design; ecological validity",
+  "report_mode": "compact_report",
+  "notes": "User confirmed that both daily-triage candidates are suitable for deep reading."
+}
