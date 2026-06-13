@@ -185,6 +185,7 @@ Expected skills:
 skills/daily-paper-triage/
 skills/single-paper-quick-read/
 skills/single-paper-deep-read/
+skills/deep-read-interaction/
 skills/theme-coreading/
 ```
 
@@ -202,6 +203,7 @@ Expected links:
 ~/.agents/skills/daily-paper-triage -> ~/.agents/paper-reading-skills/skills/daily-paper-triage
 ~/.agents/skills/single-paper-quick-read -> ~/.agents/paper-reading-skills/skills/single-paper-quick-read
 ~/.agents/skills/single-paper-deep-read -> ~/.agents/paper-reading-skills/skills/single-paper-deep-read
+~/.agents/skills/deep-read-interaction -> ~/.agents/paper-reading-skills/skills/deep-read-interaction
 ~/.agents/skills/theme-coreading -> ~/.agents/paper-reading-skills/skills/theme-coreading
 ```
 

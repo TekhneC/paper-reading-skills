@@ -66,6 +66,7 @@ network_required_for_preprint_status = true
 daily_paper_triage = "skills/daily-paper-triage/SKILL.md"
 single_paper_quick_read = "skills/single-paper-quick-read/SKILL.md"
 single_paper_deep_read = "skills/single-paper-deep-read/SKILL.md"
+deep_read_interaction = "skills/deep-read-interaction/SKILL.md"
 theme_coreading = "skills/theme-coreading/SKILL.md"
 
 [queue]

@@ -40,12 +40,14 @@ This skill must not perform:
 * full team research tracing
 * full literature review writing
 * automatic deep-read prose generation without model reading and evidence judgment
+* post-report interactive confirmation, clarification, follow-up, or consensus-note maintenance
 
 Related skills:
 
 ```text
 single-paper-quick-read   Quick-read card for one paper.
 daily-paper-triage        Daily reading queue and candidate ranking.
+deep-read-interaction     Post-report confirmation, clarification, follow-up, and consensus notes.
 theme-coreading           Comparative multi-paper synthesis.
 team-research-tracing     Future dedicated skill for full team research tracking.
 ```

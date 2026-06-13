@@ -4,6 +4,12 @@ name: theme-coreading
 description: Use this skill for interactive theme-based co-reading of multiple papers. It supports literature-review writing, research design, and new-topic understanding by maintaining a user-confirmed theme, user-confirmed research question, paper roles, comparison dimensions, field lineage tracing, supplementary reading recommendations, quick/deep read handoffs, interaction logs, and evolving synthesis reports. Do not use it for single-paper quick read, single-paper deep read, daily triage, or final literature-review writing.
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+---
+
+name: theme-coreading
+description: Use this skill for interactive theme-based co-reading of multiple papers. It supports literature-review writing, research design, and new-topic understanding by maintaining a user-controlled theme and research question, a persistent theme state, a comparison matrix, field lineage tracing, supplementary reading recommendations, quick/deep read handoffs, and an evolving synthesis report. Do not use it for single-paper quick read, single-paper deep read, daily triage, or final literature-review writing.
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 # Theme Co-reading Skill
 
 ## 1. Purpose
@@ -21,17 +27,17 @@ This skill is responsible for:
 1. preserving the user’s core theme
 2. preserving or helping clarify the user’s research question
 3. labeling paper roles relative to the user-confirmed research question
-4. maintaining an evolving co-reading session state
+4. maintaining a persistent theme state
 5. recording user interaction focus and decisions
-6. building comparison dimensions and comparison matrices
+6. building and updating a comparison matrix
 7. tracing the field lineage around the provided paper set
 8. recommending supplementary readings with evidence and confidence levels
 9. handing papers off to quick read or deep read when needed
-10. producing an evolving theme-level synthesis report
+10. producing and updating a theme-level synthesis report
 
 This skill must not replace the user’s role in deciding the research question.
 
-The core principle is:
+Core principle:
 
 ```text
 用户决定研究问题；skill 围绕该问题组织文献、比较论文、追踪谱系、补全阅读证据。
@@ -73,7 +79,7 @@ state/approvals/
 outputs/themes/<theme_id>/
 ```
 
-This skill may invoke or hand off work to:
+This skill may hand off work to:
 
 ```text
 single-paper-quick-read
@@ -196,10 +202,6 @@ Typical requests:
 ```
 
 ```text
-这几篇文章如何共同支持我的研究 arc？
-```
-
-```text
 请继续上次的 theme co-reading，并根据新的论文更新矩阵。
 ```
 
@@ -215,8 +217,6 @@ Do not use this skill for:
 * final publishable literature-review writing without user approval
 * translating entire papers
 * full team or lab research trajectory tracing
-
-Use the corresponding skill instead.
 
 If the user provides only one paper, use:
 
@@ -234,7 +234,39 @@ depending on the request.
 
 ---
 
-## 7. User-controlled theme and research question
+## 7. Minimal output architecture
+
+This skill uses only three persistent theme-level outputs:
+
+```text
+outputs/themes/<theme_id>/theme_state.md
+outputs/themes/<theme_id>/comparison_matrix.md
+outputs/themes/<theme_id>/synthesis_report.md
+```
+
+Do not create separate long-running template outputs such as:
+
+```text
+interaction_log.md
+reading_plan.md
+supplementary_readings.md
+gap_analysis.md
+writing_notes.md
+```
+
+Instead:
+
+* interaction log belongs inside `theme_state.md`
+* reading plan belongs inside `theme_state.md`
+* supplementary readings belong inside `theme_state.md` and summarized in `synthesis_report.md`
+* gaps belong inside `synthesis_report.md`
+* writing claims belong inside `synthesis_report.md`
+
+This keeps the workflow compact and recoverable.
+
+---
+
+## 8. User-controlled theme and research question
 
 Theme co-reading must be centered on the user’s own theme and research question.
 
@@ -242,7 +274,7 @@ The skill may clarify, restate, split, or operationalize the research question.
 
 The skill must not silently decide the final research question for the user.
 
-### 7.1 User input priority
+### 8.1 User input priority
 
 Prioritize user-provided:
 
@@ -263,7 +295,7 @@ Instead:
 
 1. keep `research_question` empty or marked as `not_confirmed`
 2. use quick-read evidence when available
-3. if needed, hand off provided papers to quick read
+3. if needed, hand provided papers off to quick read
 4. propose exactly three provisional research question options
 5. ask the user to confirm or revise the question before writing a formal synthesis report
 
@@ -279,9 +311,9 @@ Use this format:
 状态：provisional，等待用户确认。
 ```
 
-Do not write a formal final report using an unconfirmed research question.
+Do not write a formal final report using an unconfirmed research question unless the user explicitly approves proceeding with a provisional question.
 
-### 7.2 Research question status
+### 8.2 Research question status
 
 Every theme session must track:
 
@@ -295,11 +327,11 @@ research_question_status:
 
 A final synthesis report should use only a confirmed or explicitly user-approved research question.
 
-If the report must proceed with a provisional question, mark the synthesis confidence as low or provisional.
+If the report proceeds with a provisional question, mark the synthesis confidence as provisional.
 
 ---
 
-## 8. Interactive co-reading session state
+## 9. Persistent theme state
 
 Theme co-reading is a continuing workflow, not a one-shot report generator.
 
@@ -317,50 +349,44 @@ Users may repeatedly ask for:
 写作 arc 调整
 ```
 
-The skill must maintain and update a co-reading session state.
+The skill must maintain and update:
 
-### 8.1 Required session state
+```text
+outputs/themes/<theme_id>/theme_state.md
+```
 
-Each theme co-reading session should maintain:
+### 9.1 Required theme state fields
+
+The state file should maintain:
 
 ```text
 theme_id
 core_theme
-confirmed_research_question
+research_question
 research_question_status
+writing_goal
 paper_set
 paper_roles
 comparison_dimensions
 field_lineage_status
 supplementary_candidates
+quick_read_handoffs
+deep_read_handoffs
 user_confirmed_decisions
+user_interaction_focus
 open_questions
-reading_handoffs
 evidence_status
 synthesis_confidence
 report_version
 next_actions
 ```
 
-### 8.2 Recommended session files
+### 9.2 Co-reading consensus and next actions
 
-Recommended outputs:
+The state file must include:
 
-```text
-outputs/themes/<theme_id>/theme_state.md
-outputs/themes/<theme_id>/comparison_matrix.md
-outputs/themes/<theme_id>/synthesis_report.md
-outputs/themes/<theme_id>/interaction_log.md
-outputs/themes/<theme_id>/reading_plan.md
-outputs/themes/<theme_id>/supplementary_readings.md
-```
-
-### 8.3 Co-reading consensus and next actions
-
-Always maintain a concise summary file or section:
-
-```text
-共读关键共识与后续决策（co-reading consensus and next actions）
+```markdown
+## 共读关键共识与后续决策（co-reading consensus and next actions）
 ```
 
 It should record:
@@ -377,9 +403,9 @@ This ensures the user can re-enter the co-reading session later and quickly rest
 
 ---
 
-## 9. User interaction focus and decision log
+## 10. User interaction focus and decision log
 
-The final or updated synthesis report must include:
+The state file and the synthesis report must include a concise section:
 
 ```markdown
 ## 用户交互重点与决策记录（user interaction focus and decision log）
@@ -405,61 +431,51 @@ Use this format:
 |  |  |  |
 ```
 
-Do not omit this section in the final synthesis report.
+Do not omit this section in `synthesis_report.md`.
 
 ---
 
-## 10. Co-reading modes
+## 11. Co-reading focus modes
 
-Before writing the output, determine `co_reading_mode`.
+Before writing the output, determine `co_reading_focus`.
 
 Allowed values:
 
 ```text
-exploratory_co_reading
-comparison_matrix
-taxonomy_building
-evaluation_synthesis
-method_lineage
-field_lineage_tracing
-survey_writing_support
-research_gap_analysis
-project_borrowing
-default_co_reading
+orientation
+comparison
+taxonomy
+evaluation
+field_lineage
+writing_support
 ```
 
-### 10.1 exploratory_co_reading
+### 11.1 orientation
 
-Use when the user is entering a new topic and wants an initial map.
+Use when the user is entering a new topic.
 
 Focus:
 
-* confirmed or provisional theme
+* theme state
 * research question status
 * paper roles
-* possible comparison dimensions
-* initial reading gaps
-* likely supplementary readings
-* which papers deserve quick read or deep read
+* provisional dimensions
+* reading gaps
+* supplementary reading candidates
 
-### 10.2 comparison_matrix
+### 11.2 comparison
 
 Use when the user wants structured comparison.
 
 Focus:
 
-* task formulation
-* input / output
-* method
-* dataset
-* metric
-* baseline
-* evaluation
-* limitation
-* relevance to user research
+* comparison dimensions
+* comparison matrix
+* paper roles
 * evidence strength
+* cross-paper synthesis
 
-### 10.3 taxonomy_building
+### 11.3 taxonomy
 
 Use when the user wants a classification framework.
 
@@ -470,10 +486,9 @@ Focus:
 * boundaries
 * representative papers
 * missing categories
-* whether categories are mutually exclusive or hierarchical
-* whether the taxonomy supports the user’s research question
+* whether taxonomy supports the user’s research question
 
-### 10.4 evaluation_synthesis
+### 11.4 evaluation
 
 Use when the user cares about evaluation.
 
@@ -487,22 +502,7 @@ Focus:
 * validity of metrics
 * process-level or interaction-level evaluation gaps
 
-### 10.5 method_lineage
-
-Use when the user wants method evolution.
-
-Focus:
-
-* prior work
-* baseline work
-* method inheritance
-* conceptual shift
-* technical shift
-* later extensions
-
-This is not full team tracing.
-
-### 10.6 field_lineage_tracing
+### 11.5 field_lineage
 
 Use when the user needs to understand whether the current paper set is complete enough.
 
@@ -517,7 +517,7 @@ Focus:
 * missing field anchors
 * supplementary reading recommendations
 
-### 10.7 survey_writing_support
+### 11.6 writing_support
 
 Use when the output will support literature-review writing.
 
@@ -527,38 +527,13 @@ Focus:
 * taxonomy
 * paragraph-level synthesis
 * comparison dimensions
-* adjacent survey relation
 * claims that can be safely made
 * citations and evidence boundaries
-
-### 10.8 research_gap_analysis
-
-Use when the user wants unresolved problems.
-
-Focus:
-
-* what the papers solve
-* what remains unsolved
-* whether gaps are real or artificial
-* what evidence supports the gap
-* how the user’s research could enter the gap
-
-### 10.9 project_borrowing
-
-Use when the user wants inspiration for their own project.
-
-Focus:
-
-* borrowable task design
-* borrowable evaluation design
-* borrowable interface or system ideas
-* non-transferable assumptions
-* risks of direct copying
-* possible adaptation to user research
+* risk of overclaiming
 
 ---
 
-## 11. Inputs
+## 12. Inputs
 
 Use available inputs when present:
 
@@ -568,15 +543,13 @@ state/reading_queue.json
 state/approvals/
 outputs/papers/<paper_key>/quick_read.md
 outputs/papers/<paper_key>/deep_read.md
-outputs/themes/<theme_id>/
+outputs/themes/<theme_id>/theme_state.md
+outputs/themes/<theme_id>/comparison_matrix.md
+outputs/themes/<theme_id>/synthesis_report.md
 config/paths.toml
 templates/theme_state.md
-templates/theme_packet.md
 templates/comparison_matrix.md
 templates/theme_synthesis.md
-templates/interaction_log.md
-templates/reading_plan.md
-templates/supplementary_readings.md
 ```
 
 A paper set may be identified by:
@@ -584,59 +557,15 @@ A paper set may be identified by:
 1. user-provided paper keys
 2. Zotero collection
 3. Zotero tag
-4. theme packet
-5. local folder
-6. existing quick-read outputs
-7. existing deep-read outputs
-8. a user-provided bibliography
-9. a search result list
+4. local folder
+5. existing quick-read outputs
+6. existing deep-read outputs
+7. a user-provided bibliography
+8. a search result list
 
 If the paper set is ambiguous, report the ambiguity.
 
 Do not invent paper identities.
-
----
-
-## 12. Outputs
-
-This skill may produce or update:
-
-```text
-outputs/themes/<theme_id>/theme_state.md
-outputs/themes/<theme_id>/theme_packet.md
-outputs/themes/<theme_id>/comparison_matrix.md
-outputs/themes/<theme_id>/synthesis_report.md
-outputs/themes/<theme_id>/interaction_log.md
-outputs/themes/<theme_id>/reading_plan.md
-outputs/themes/<theme_id>/supplementary_readings.md
-outputs/themes/<theme_id>/gap_analysis.md
-outputs/themes/<theme_id>/writing_notes.md
-```
-
-Default output when a formal synthesis is requested:
-
-```text
-outputs/themes/<theme_id>/synthesis_report.md
-```
-
-Default output during an ongoing session:
-
-```text
-outputs/themes/<theme_id>/theme_state.md
-```
-
-This skill may propose state updates such as:
-
-```text
-queued -> quick_read_done
-quick_read_done -> deep_read_candidate
-```
-
-Only propose state updates when grounded in actual outputs.
-
-Do not mark any paper as `deep_read_approved`.
-
-Do not mark any paper as `deep_read_done`.
 
 ---
 
@@ -761,7 +690,84 @@ If core papers lack deep-read reports, mark theme-level synthesis confidence as 
 
 ---
 
-## 16. Field lineage tracing
+## 16. Comparison matrix
+
+The comparison matrix is the evidence base for synthesis.
+
+Maintain:
+
+```text
+outputs/themes/<theme_id>/comparison_matrix.md
+```
+
+Default dimensions for research-article clusters:
+
+```text
+paper role
+research problem
+task formulation
+input / output
+method paradigm
+data and representation
+evaluation metrics
+datasets / benchmarks
+baselines
+human evaluation or user study
+limitations
+claim-evidence alignment
+relation to user research
+evidence strength
+```
+
+Default dimensions for survey clusters:
+
+```text
+paper role
+survey scope
+inclusion / exclusion boundary
+organizing perspective
+taxonomy
+coverage
+relation to adjacent surveys
+challenges
+future directions
+transferable review structure
+evidence strength
+```
+
+Default dimensions for mixed clusters:
+
+```text
+paper role
+problem / scope
+task or taxonomy
+method or organizing perspective
+evaluation or evidence standard
+contribution to theme
+limitations
+transferable insight
+evidence strength
+```
+
+Adapt dimensions to the user’s confirmed research question.
+
+Mark unknown values as:
+
+```text
+文中未说明。
+```
+
+or:
+
+```text
+证据不足。
+```
+
+Do not fill empty cells by guessing.
+
+---
+
+## 17. Field lineage tracing
 
 Users often do not know all key papers when starting co-reading.
 
@@ -771,7 +777,7 @@ This is not free-form recommendation.
 
 It is evidence-chain expansion.
 
-### 16.1 Field lineage tracing goals
+### 17.1 Field lineage tracing goals
 
 Field lineage tracing should answer:
 
@@ -782,7 +788,7 @@ Field lineage tracing should answer:
 5. Which adjacent directions may be missing?
 6. Is the current paper set sufficient to support the research question?
 
-### 16.2 Tracing paths
+### 17.2 Tracing paths
 
 Use this priority order:
 
@@ -797,7 +803,7 @@ Use this priority order:
 8. recent papers using the same task, metric, dataset, or system framing
 ```
 
-### 16.3 Candidate confidence levels
+### 17.3 Candidate confidence levels
 
 Every lineage relation or supplementary reading candidate must be assigned one confidence level:
 
@@ -826,9 +832,21 @@ Needs external search before being treated as related work.
 
 Do not present `candidate` or `unverified` works as field anchors.
 
+Store field lineage notes and supplementary candidates in:
+
+```text
+outputs/themes/<theme_id>/theme_state.md
+```
+
+Summarize confirmed or high-value items in:
+
+```text
+outputs/themes/<theme_id>/synthesis_report.md
+```
+
 ---
 
-## 17. Supplementary reading recommendations
+## 18. Supplementary reading recommendations
 
 The skill must recommend supplementary readings when the current paper set appears incomplete.
 
@@ -869,9 +887,13 @@ If external search is unavailable, write:
 补充文献推荐需要外部检索确认；当前仅基于本地 PDF、references、baseline 与 Zotero 索引进行有限判断。
 ```
 
+Store detailed recommendations in `theme_state.md`.
+
+Summarize only the most important recommendations in `synthesis_report.md`.
+
 ---
 
-## 18. Quick read and deep read handoff
+## 19. Quick read and deep read handoff
 
 Theme co-reading may hand off papers to single-paper reading skills.
 
@@ -879,7 +901,7 @@ The co-reading skill decides what evidence is missing and records the handoff.
 
 It does not duplicate full quick-read or deep-read logic.
 
-### 18.1 When to hand off to quick read
+### 19.1 When to hand off to quick read
 
 Use or invoke:
 
@@ -895,7 +917,7 @@ when:
 4. the skill needs to know whether a paper is a baseline, survey, background, or core work
 5. a paper is only used to expand the literature pool
 
-Record:
+Record in `theme_state.md`:
 
 ```markdown
 | Paper | Reason for quick read | Expected decision |
@@ -903,7 +925,7 @@ Record:
 |  |  | include / exclude / deep_read_candidate |
 ```
 
-### 18.2 When to hand off to deep read
+### 19.2 When to hand off to deep read
 
 Use or invoke:
 
@@ -921,7 +943,7 @@ when:
 6. the paper’s claim-evidence or scope-taxonomy judgment affects the theme conclusion
 7. the paper has not been deep-read but its importance reaches the threshold for deep reading
 
-Record:
+Record in `theme_state.md`:
 
 ```markdown
 | Paper | Reason for deep read | Suggested report mode | Expected contribution to co-reading |
@@ -929,7 +951,7 @@ Record:
 |  |  | full_report / compact_report |  |
 ```
 
-### 18.3 Co-reading does not replace deep read
+### 19.3 Co-reading does not replace deep read
 
 Co-reading can reference deep-read reports.
 
@@ -943,7 +965,7 @@ If a key paper lacks a necessary deep-read report, write:
 
 ---
 
-## 19. Co-reading workflow
+## 20. Workflow
 
 ### Step 1. Start or restore the session
 
@@ -1007,9 +1029,11 @@ external_search
 user_confirmation
 ```
 
-### Step 4. Record interaction focus
+### Step 4. Update interaction focus and decisions
 
-Update `interaction_log.md` or the corresponding report section with:
+Update the relevant section in `theme_state.md`.
+
+Record:
 
 ```text
 user questions
@@ -1023,140 +1047,45 @@ open questions
 
 ### Step 5. Determine comparison dimensions
 
-Before summarizing papers, define comparison dimensions.
+Define comparison dimensions before writing synthesis.
 
-Default dimensions for research-article clusters:
-
-```text
-research problem
-task formulation
-input / output
-method paradigm
-data and representation
-evaluation metrics
-datasets / benchmarks
-baselines
-human evaluation or user study
-limitations
-claim-evidence alignment
-relation to user research
-evidence strength
-```
-
-Default dimensions for survey clusters:
-
-```text
-survey scope
-inclusion / exclusion boundary
-organizing perspective
-taxonomy
-coverage
-relation to adjacent surveys
-challenges
-future directions
-transferable review structure
-evidence strength
-```
-
-Default dimensions for mixed clusters:
-
-```text
-paper role
-problem / scope
-task or taxonomy
-method or organizing perspective
-evaluation or evidence standard
-contribution to theme
-limitations
-transferable insight
-evidence strength
-```
-
-Adapt dimensions to the user’s confirmed research question.
+Use the user-confirmed research question as the controlling logic.
 
 ### Step 6. Build or update the comparison matrix
-
-Create or update a matrix before writing synthesis.
-
-For research-article clusters:
-
-```markdown
-| Paper | Role | Problem | Task formulation | Method paradigm | Data / representation | Evaluation metrics | Baselines | Key limitation | Transferable insight | Evidence strength |
-|---|---|---|---|---|---|---|---|---|---|---|
-|  |  |  |  |  |  |  |  |  |  |  |
-```
-
-For survey clusters:
-
-```markdown
-| Survey | Role | Scope | Inclusion / exclusion | Organizing perspective | Taxonomy | Adjacent survey relation | Challenges | Future directions | Useful for user research | Evidence strength |
-|---|---|---|---|---|---|---|---|---|---|---|
-|  |  |  |  |  |  |  |  |  |  |  |
-```
-
-For mixed clusters:
-
-```markdown
-| Paper | Role | Scope / problem | Framework / method | Evidence standard | Contribution to theme | Limitation | Use for user research | Evidence strength |
-|---|---|---|---|---|---|---|---|---|
-|  |  |  |  |  |  |  |  |  |
-```
-
-Do not skip the matrix unless the user explicitly asks for prose only.
-
-Mark unknown values as:
-
-```text
-文中未说明。
-```
-
-or:
-
-```text
-证据不足。
-```
-
-Do not fill empty cells by guessing.
-
-### Step 7. Trace field lineage
-
-Trace the field lineage using the paths in Section 16.
-
-Produce or update:
-
-```text
-outputs/themes/<theme_id>/supplementary_readings.md
-```
-
-If external search is unavailable, mark the lineage as locally inferred.
-
-### Step 8. Recommend supplementary readings
-
-Recommend supplementary readings using Section 17.
-
-Prioritize candidates that help answer the user-confirmed research question.
-
-Do not recommend papers only because they are famous.
-
-### Step 9. Decide quick/deep read handoffs
 
 Create or update:
 
 ```text
-outputs/themes/<theme_id>/reading_plan.md
+outputs/themes/<theme_id>/comparison_matrix.md
 ```
 
-Include:
+The matrix must include evidence strength.
 
-1. papers needing quick read
-2. papers needing deep read
-3. reason for handoff
-4. expected contribution to the co-reading synthesis
-5. suggested priority
+Do not write synthesis from memory alone.
 
-### Step 10. Write or update synthesis
+### Step 7. Trace field lineage and recommend supplementary readings
 
-Write synthesis only after:
+Use references, related work, baselines, adjacent surveys, datasets, benchmarks, follow-up works, and external search when available.
+
+Store detailed lineage notes and recommendations in `theme_state.md`.
+
+Summarize only important recommendations in `synthesis_report.md`.
+
+### Step 8. Decide quick/deep read handoffs
+
+Update handoff tables in `theme_state.md`.
+
+Do not mark papers as `deep_read_approved`.
+
+### Step 9. Write or update synthesis
+
+Write or update:
+
+```text
+outputs/themes/<theme_id>/synthesis_report.md
+```
+
+Only after:
 
 1. theme is clear
 2. research question is confirmed or explicitly marked provisional
@@ -1176,166 +1105,44 @@ A 和 B 都关注……，但 A 通过……，B 通过……
 该方向的评价仍然集中在……，尚未充分覆盖……
 ```
 
-### Step 11. Update co-reading consensus and next actions
+### Step 10. Update co-reading consensus and next actions
 
-At the end of each co-reading update, include:
+At the end of each co-reading update, update:
 
 ```markdown
 ## 共读关键共识与后续决策（co-reading consensus and next actions）
 ```
 
-This section should include:
-
-1. confirmed conclusions
-2. remaining open questions
-3. supplementary readings to verify
-4. quick/deep read handoffs
-5. next recommended comparison dimensions
-6. next report update target
+in `theme_state.md`.
 
 ---
 
-## 20. Theme packet format
+## 21. Synthesis report rules
 
-If creating a theme packet, use:
+The synthesis report must not be a list of isolated paper summaries.
 
-```markdown
-# Theme Packet - <Theme Title>
+It should include:
 
-## Metadata
-
-- Theme ID:
-- Core theme:
-- Research question:
-- Research question status: confirmed / provisional / missing / revised
-- Co-reading mode:
-- Paper set:
-- Writing goal:
-- Output target:
-- Created at:
-- Updated at:
-
-## 1. Theme definition
-
-## 2. User-confirmed research question
-
-## 3. Paper set and roles
-
-| Paper | Year | Role | Relation to research question | Evidence status | Existing output | Needed next step |
-|---|---:|---|---|---|---|---|
-
-## 4. Paper set boundary
-
-- Included papers:
-- Excluded or missing papers:
-- Why this set is sufficient / insufficient:
-- Need further search:
-
-## 5. Proposed comparison dimensions
-
-## 6. Field lineage tracing status
-
-## 7. Supplementary reading candidates
-
-## 8. Quick / Deep Read handoff plan
-
-## 9. Open questions
-
-## 10. Co-reading consensus and next actions
-```
+1. confirmed or explicitly provisional theme and research question
+2. paper set boundary
+3. paper roles
+4. user interaction focus and decision log
+5. comparison dimensions
+6. reference to the comparison matrix
+7. cross-paper synthesis
+8. method, task, taxonomy, or evaluation evolution
+9. field lineage tracing summary
+10. supplementary reading recommendations
+11. quick/deep read handoff summary
+12. tensions and research gaps
+13. review-writing claims
+14. implications for the user’s research
+15. evidence level and synthesis confidence
+16. co-reading consensus and next actions
 
 ---
 
-## 21. Synthesis report format
-
-Use `templates/theme_synthesis.md` if available.
-
-If missing, use this fallback format:
-
-```markdown
-# Theme Co-reading Synthesis - <Theme Title>
-
-## Metadata
-
-- Theme ID:
-- Core theme:
-- Research question:
-- Research question status:
-- Co-reading mode:
-- Paper set:
-- Writing goal:
-- Evidence status:
-- Report version:
-
-## 0. 核心结论先行（executive takeaway）
-
-## 1. 用户确认的主题与研究问题（confirmed theme and research question）
-
-## 2. 论文集合边界（paper set boundary）
-
-## 3. 论文角色标注（paper roles）
-
-## 4. 用户交互重点与决策记录（user interaction focus and decision log）
-
-## 5. 比较维度（comparison dimensions）
-
-## 6. 比较矩阵（comparison matrix）
-
-## 7. 跨论文综合（cross-paper synthesis）
-
-## 8. 方法、任务或分类演化（method / task / taxonomy evolution）
-
-## 9. 评价方式综合（evaluation synthesis）
-
-## 10. 领域研究谱系追踪（field lineage tracing）
-
-## 11. 补充阅读推荐（recommended supplementary readings）
-
-## 12. Quick / Deep Read handoff 计划（reading handoff plan）
-
-## 13. 张力与研究空白（tensions and research gaps）
-
-## 14. 综述写作可用结论（review-writing claims）
-
-## 15. 对用户研究的启示（implications for the user's research）
-
-## 16. 英文写作与 oral 可用素材（English-ready synthesis）
-
-## 17. 证据等级与综合置信度（evidence level and synthesis confidence）
-
-## 18. 共读关键共识与后续决策（co-reading consensus and next actions）
-```
-
----
-
-## 22. Cross-paper synthesis rules
-
-Do not summarize papers one by one.
-
-A good synthesis should identify:
-
-1. common problem
-2. shared assumptions
-3. different task formulations
-4. method evolution
-5. evaluation pattern
-6. missing baselines or datasets
-7. unresolved challenges
-8. useful directions for the user
-
-Use cross-paper comparisons such as:
-
-```text
-A 和 B 都关注……，但 A 将问题定义为……，B 则将问题定义为……
-这组论文共同显示……的评价仍然集中在……，尚未充分覆盖……
-从方法谱系看，A 提供了……，B 将其扩展为……，C 则转向……
-```
-
-Every synthesis claim should identify its evidence basis.
-
----
-
-## 23. Tensions and gaps
+## 22. Tensions and gaps
 
 Theme-level reading should identify tensions, not only similarities.
 
@@ -1371,7 +1178,7 @@ A gap is valid only when it follows from comparison, evidence, or explicit uncer
 
 ---
 
-## 24. Review-writing claims
+## 23. Review-writing claims
 
 When co-reading supports literature-review writing, include:
 
@@ -1401,7 +1208,7 @@ Do not write claims stronger than the paper set supports.
 
 ---
 
-## 25. Implications for the user's research
+## 24. Implications for the user's research
 
 The synthesis must include:
 
@@ -1445,7 +1252,7 @@ Prefer:
 
 ---
 
-## 26. English-ready synthesis
+## 25. English-ready synthesis
 
 When useful, include:
 
@@ -1469,7 +1276,7 @@ Do not write a final English literature-review section unless the user asks.
 
 ---
 
-## 27. Failure handling
+## 26. Failure handling
 
 If no theme is provided, write:
 
@@ -1521,19 +1328,14 @@ If supplementary readings cannot be verified, write:
 
 ---
 
-## 28. Completion criteria
+## 27. Completion criteria
 
 This skill is complete when it produces or updates one of the following:
 
-1. a theme state file
-2. a theme packet
-3. an interaction log
-4. a comparison matrix
-5. a field lineage tracing note
-6. a supplementary reading recommendation list
-7. a quick/deep read handoff plan
-8. a theme-level synthesis report
-9. a clear explanation of why co-reading cannot proceed
+1. `theme_state.md`
+2. `comparison_matrix.md`
+3. `synthesis_report.md`
+4. a clear explanation of why co-reading cannot proceed
 
 A complete synthesis report must include:
 
@@ -1542,11 +1344,11 @@ A complete synthesis report must include:
 3. paper roles
 4. user interaction focus and decision log
 5. comparison dimensions
-6. comparison matrix
+6. comparison matrix reference
 7. cross-paper synthesis
-8. field lineage tracing
+8. field lineage tracing summary
 9. supplementary reading recommendations
-10. quick/deep read handoff plan
+10. quick/deep read handoff summary
 11. tensions and gaps
 12. implications for the user's research
 13. evidence level and synthesis confidence
