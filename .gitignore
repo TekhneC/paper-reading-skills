@@ -1,5 +1,5 @@
-state/cache/
-state/tmp/
+state
+outputs
 __pycache__/
 *.pyc
 *.sqlite
