@@ -105,10 +105,48 @@ export function renderMarkdown(markdown = "") {
 }
 
 function inline(value) {
-  return escapeHtml(value)
+  return renderInline(value)
     .replace(/`([^`]+)`/g, "<code>$1</code>")
-    .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
-    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noreferrer">$1</a>');
+    .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+}
+
+function renderInline(value) {
+  const pattern = /(!?)\[([^\]]*)\]\((<[^>]+>|[^)]+)\)/g;
+  let cursor = 0;
+  let html = "";
+  for (const match of value.matchAll(pattern)) {
+    html += escapeHtml(value.slice(cursor, match.index));
+    const isImage = match[1] === "!";
+    const label = match[2].trim();
+    const target = normalizeMarkdownTarget(match[3]);
+    html += isImage ? imageHtml(label, target) : linkHtml(label, target);
+    cursor = match.index + match[0].length;
+  }
+  html += escapeHtml(value.slice(cursor));
+  return html;
+}
+
+function normalizeMarkdownTarget(target = "") {
+  const trimmed = target.trim();
+  if (trimmed.startsWith("<") && trimmed.endsWith(">")) {
+    return trimmed.slice(1, -1).trim();
+  }
+  return trimmed.split(/\s+(?=["'])/)[0].trim();
+}
+
+function resolveMediaUrl(target) {
+  if (/^(https?:|data:|blob:|\/)/i.test(target)) return target;
+  return `/api/file?path=${encodeURIComponent(target)}`;
+}
+
+function imageHtml(alt, target) {
+  const src = resolveMediaUrl(target);
+  return `<img class="markdown-image" src="${escapeHtml(src)}" alt="${escapeHtml(alt)}" data-markdown-src="${escapeHtml(target)}" loading="lazy" />`;
+}
+
+function linkHtml(label, target) {
+  const href = /^(https?:|mailto:|\/)/i.test(target) ? target : resolveMediaUrl(target);
+  return `<a href="${escapeHtml(href)}" target="_blank" rel="noreferrer">${escapeHtml(label || target)}</a>`;
 }
 
 export function extractHeadings(markdown = "") {

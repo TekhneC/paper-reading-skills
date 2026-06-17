@@ -5,13 +5,16 @@ This is a zero-install local web console for the paper-reading skill cluster.
 ## Run
 
 ```powershell
-& 'C:\Program Files (x86)\MYSYS2\ucrt64\bin\python.exe' site\server.py --host 127.0.0.1 --port 8765
+.\site\run_site.ps1
 ```
 
-Or use the launcher:
+The launcher reads `[runtime].python_path` from `config/paths.toml` when available,
+so the site uses the same Python runtime as the repository scripts.
+
+Or run the server directly:
 
 ```powershell
-.\site\run_site.ps1
+& 'C:\Users\tekhnec\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe' site\server.py --host 127.0.0.1 --port 8765
 ```
 
 Then open:
@@ -32,8 +35,9 @@ http://127.0.0.1:8765
 - View local source PDFs when a queue entry or source cache records a readable PDF path.
 - View dated archives from `outputs/daily/YYYY-MM-DD/`.
 - View theme co-reading state, comparison matrix, and synthesis reports from `outputs/themes/<theme_id>/`.
+- Use a co-reading workspace that shows public coreading Markdown outputs beside a Codex-backed chat composer.
 - Edit and save idea maps by adding, dragging, deleting, and directly editing nodes.
-- Send co-reading interaction messages in a chat UI to `state/coreading_messages.jsonl`.
+- Send deep-read and co-reading questions to external Codex skill calls, then persist the user/Codex turns in local JSONL logs.
 
 ## Structure
 

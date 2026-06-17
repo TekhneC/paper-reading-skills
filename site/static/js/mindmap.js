@@ -1,4 +1,4 @@
-import { escapeHtml, extractHeadings } from "./markdown.js";
+import { escapeHtml, extractHeadings } from "./markdown.js?v=20260617-workflow-bridge";
 
 const CANVAS_W = 1160;
 const CANVAS_H = 680;

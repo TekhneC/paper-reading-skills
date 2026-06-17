@@ -41,10 +41,22 @@ cache_ttl_days = 7
 daily_paper_triage = "skills/daily-paper-triage/SKILL.md"
 single_paper_quick_read = "skills/single-paper-quick-read/SKILL.md"
 single_paper_deep_read = "skills/single-paper-deep-read/SKILL.md"
+deep_read_interaction = "skills/deep-read-interaction/SKILL.md"
 theme_coreading = "skills/theme-coreading/SKILL.md"
+
+[codex]
+command = "codex"
+exec_args = ["exec", "--sandbox", "workspace-write", "--ephemeral"]
+timeout_seconds = 1800
+run_daily_from_site = true
+daily_fallback_on_codex_failure = false
+
+[runtime]
+python_path = ""
 
 [queue]
 todo_tag = "todo"
 daily_limit = 5
+refresh_from_zotero_on_daily = true
 abstract_policy = "truncate"
 abstract_max_chars = 600

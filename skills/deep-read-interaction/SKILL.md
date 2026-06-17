@@ -40,14 +40,51 @@ outputs/papers/<paper_key>/quick_read.json
 
 For exploratory follow-up or research ideas, answer from the report first and state whether the answer is report-based or source-verified.
 
+## Intent Classification
+
+Classify each user input into exactly one primary interaction mode before
+answering:
+
+```text
+confirmation
+clarification
+follow_up
+divergent_thinking
+```
+
+Use `confirmation` when the user asks whether their understanding is correct.
+Use `clarification` when the user asks what a term, claim, figure, method,
+metric, or limitation means. Use `follow_up` when the user asks a question that
+extends the existing report. Use `divergent_thinking` when the user asks for
+research implications, comparisons, hypotheses, design ideas, or possible
+future work.
+
+If the website or user provides a manual classification, respect it unless the
+latest question clearly contradicts that mode. If you override it, keep the
+answer direct and do not explain the classification unless the user asks.
+
 ## Output Requirements
+
+Default output is a chat answer, not a standalone Markdown document.
+
+For ordinary questions, produce only the direct response to the user's latest
+question. Do not include metadata blocks, repeated user questions, long report
+excerpts, full context dumps, or generic saving advice. Keep the answer concise
+and conversational while remaining evidence-grounded.
+
+Only produce structured notes or correction records when the user explicitly asks
+to record, save, update notes, or correct the report.
 
 Produce one of:
 
-- a source-checked confirmation or clarification;
-- a report-based follow-up answer with source-check status stated;
-- a clearly marked divergent research idea;
+- a direct confirmation or clarification answer;
+- a direct report-based follow-up answer;
+- a clearly marked but concise divergent research idea;
 - an updated consensus note;
 - a backed-up and corrected deep-read report for a verified factual error.
+
+For follow-up questions, do not provide detailed evidence locations by default.
+Provide citations only when the user asks for evidence, asks to verify a claim,
+asks for correction, or the answer depends on a precise factual point.
 
 Default language is Chinese. Preserve English technical terms when useful.

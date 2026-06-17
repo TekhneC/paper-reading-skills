@@ -1,14 +1,24 @@
 import {
   approveDeepRead,
+  clearDeepReadInteractions,
+  deleteDeepReadInteractionMessage,
+  deletePaper,
   fetchDashboard,
   saveMarkdown,
   saveMindMap,
+  sendDeepReadInteractionMessage,
   sendCoreadingMessage,
   triggerDailyArchive,
   updatePaperState,
-} from "./api.js";
-import { escapeHtml, renderMarkdown } from "./markdown.js";
-import { bindMindMapEditor, readMindMapData, renderMindMap } from "./mindmap.js";
+} from "./api.js?v=20260617-workflow-bridge";
+import { escapeHtml, renderMarkdown } from "./markdown.js?v=20260617-workflow-bridge";
+import { bindMindMapEditor, readMindMapData, renderMindMap } from "./mindmap.js?v=20260617-workflow-bridge";
+import {
+  bindCoreadingWorkspace,
+  renderCoreadingWorkspace,
+  renderMessageOverview,
+  renderThemeOverview,
+} from "./coreading.js?v=20260617-workflow-bridge";
 import { currentItems, jumpTo, paperByKey, selectedItem, setDashboard, state, themeById } from "./state.js";
 
 const appShell = document.querySelector("#appShell");
@@ -20,8 +30,34 @@ const searchInput = document.querySelector("#searchInput");
 const refreshButton = document.querySelector("#refreshButton");
 const sidebarToggle = document.querySelector("#sidebarToggle");
 const dailyWorkflowButton = document.querySelector("#dailyWorkflowButton");
+const dailyRunStatus = document.querySelector("#dailyRunStatus");
 const modeButtons = [...document.querySelectorAll(".segment")];
 const viewButtons = [...document.querySelectorAll(".view-tab")];
+let dailyStatusPoll = null;
+let dailyRunStatusCollapsed = window.localStorage.getItem("dailyRunStatusCollapsed") === "true";
+
+const DEEP_INTERACTION_INTENTS = [
+  {
+    mode: "confirmation",
+    label: "确认理解",
+    template: "请基于原文证据确认我的理解是否正确，并按“基本正确 / 部分正确 / 证据不足 / 与原文不符”回答。",
+  },
+  {
+    mode: "clarification",
+    label: "澄清概念",
+    template: "请解释当前精读报告中的一个概念、图示或方法细节，并区分论文明确说明、合理推断和仍不确定之处。",
+  },
+  {
+    mode: "follow_up",
+    label: "延伸问题",
+    template: "请基于这篇论文的精读报告回答一个延伸问题。",
+  },
+  {
+    mode: "divergent_thinking",
+    label: "研究发散",
+    template: "请从这篇论文出发，提出与我的研究相关的设计启发、比较维度或实验想法，并清楚标注哪些是推测。",
+  },
+];
 
 async function boot() {
   bindEvents();
@@ -100,6 +136,96 @@ function renderSummary() {
   summaryGrid.innerHTML = metrics
     .map(([label, value]) => `<div class="metric"><strong>${value}</strong><span>${label}</span></div>`)
     .join("");
+  renderDailyRunStatus();
+}
+
+function renderDailyRunStatus() {
+  if (!dailyRunStatus) return;
+  const status = state.dashboard?.daily_run_status;
+  const logPath = status?.log_path || state.dashboard?.repo?.daily_run_log || "state/daily_run_log.jsonl";
+  const logHref = `/api/file?path=${encodeURIComponent(logPath)}`;
+  if (dailyRunStatusCollapsed && status?.status !== "running") {
+    dailyRunStatus.innerHTML = `<a class="daily-log-link" href="${escapeHtml(logHref)}" target="_blank" rel="noreferrer">查看 codex daily 日志</a>`;
+    return;
+  }
+  if (!status) {
+    dailyRunStatus.innerHTML = `<p class="muted compact-text">暂无 Daily 运行记录。</p>`;
+    return;
+  }
+  const statusBadge = status.status === "completed" ? "good" : status.status === "running" ? "" : "warn";
+  const logs = status.logs || [];
+  const latestLog = logs[logs.length - 1];
+  const canClose = status.status && status.status !== "running";
+  dailyRunStatus.innerHTML = `<div class="daily-status-card ${status.status === "running" ? "is-running" : ""}">
+    <div class="daily-status-head">
+      <span class="badge ${statusBadge}">${escapeHtml(status.status || "unknown")}</span>
+      <span class="daily-status-date">${escapeHtml(status.date || "")}</span>
+    </div>
+    ${canClose ? `<button class="daily-status-close" id="closeDailyStatusButton" type="button" aria-label="收起 Daily 运行状态">×</button>` : ""}
+    <strong>${escapeHtml(status.step || "daily")}</strong>
+    <p>${escapeHtml(status.message || latestLog?.message || "暂无状态消息。")}</p>
+    <small>${escapeHtml(status.updated_at || "")}</small>
+    <a class="daily-status-log-inline" href="${escapeHtml(logHref)}" target="_blank" rel="noreferrer">查看 codex daily 日志</a>
+  </div>`;
+  document.querySelector("#closeDailyStatusButton")?.addEventListener("click", () => {
+    dailyRunStatusCollapsed = true;
+    window.localStorage.setItem("dailyRunStatusCollapsed", "true");
+    renderDailyRunStatus();
+  });
+}
+
+function renderDailyDebugPanel() {
+  const status = state.dashboard?.daily_run_status;
+  if (!status) return "";
+  const logs = status.logs || [];
+  const rows = logs
+    .slice(-18)
+    .reverse()
+    .map((log) => `<tr>
+      <td>${escapeHtml(log.created_at || "")}</td>
+      <td>${escapeHtml(log.step || "")}</td>
+      <td>${escapeHtml(log.message || "")}</td>
+    </tr>`)
+    .join("");
+  return `<section class="daily-debug-panel">
+    <div class="daily-debug-header">
+      <div>
+        <h3>Daily 运行状态</h3>
+        <p class="muted">外部 Codex 调用 <code>$daily-paper-triage</code> 的状态、产物校验与最近日志。</p>
+      </div>
+      <span class="badge ${status.status === "completed" ? "good" : status.status === "failed" ? "warn" : ""}">${escapeHtml(status.status || "unknown")}</span>
+    </div>
+    <div class="meta-grid">
+      ${meta("Run ID", status.run_id)}
+      ${meta("Date", status.date)}
+      ${meta("Step", status.step)}
+      ${meta("Log", status.log_path)}
+      ${meta("Codex", status.codex_status)}
+      ${meta("Archive", status.archive_path)}
+    </div>
+    ${status.message ? `<p>${escapeHtml(status.message)}</p>` : ""}
+    ${status.missing_outputs?.length ? `<p class="daily-error">缺少产物：${escapeHtml(status.missing_outputs.join(", "))}</p>` : ""}
+    ${
+      status.codex_reply
+        ? `<details class="daily-codex-reply">
+            <summary>查看 Codex 返回 / 报错</summary>
+            <pre><code>${escapeHtml(compactText(status.codex_reply, 8000))}</code></pre>
+          </details>`
+        : ""
+    }
+    <details class="daily-log-table" open>
+      <summary>最近日志</summary>
+      <table>
+        <thead><tr><th>时间</th><th>步骤</th><th>消息</th></tr></thead>
+        <tbody>${rows || `<tr><td colspan="3">暂无日志。</td></tr>`}</tbody>
+      </table>
+    </details>
+  </section>`;
+}
+
+function compactText(value, limit = 4000) {
+  const text = String(value || "");
+  return text.length <= limit ? text : `${text.slice(0, limit).trimEnd()}\n...`;
 }
 
 function renderList() {
@@ -175,6 +301,7 @@ function renderHeader(item) {
       ${item.kind === "todo" ? `<button class="primary-button" id="handleTodoButton">${todoActionLabel(item.raw)}</button>` : ""}
       ${canApprove ? `<button class="primary-button" id="approveButton">批准精读</button>` : ""}
       ${isPaper ? renderStateSelect(raw) : ""}
+      ${isPaper ? `<button class="danger-button" id="deletePaperButton" type="button">删除文献</button>` : ""}
       <button class="secondary-button" id="copyIdButton">复制 ID</button>
     </div>
   </div>`;
@@ -242,18 +369,10 @@ function renderTodoOverview(todo) {
     <section>
       <h3>当日阅读</h3>
       ${renderMarkdown(state.dashboard?.latest_daily?.digest?.content || "暂无当日归档。可在左侧底部点击“触发 Daily”生成。")}
+      ${renderDailyDebugPanel()}
     </section>
     ${linkedPaper ? `<section><h3>关联文献</h3>${renderPaperMini(linkedPaper)}</section>` : ""}
   </div>`;
-}
-
-function renderThemeOverview(theme) {
-  return `<div class="meta-grid">
-    ${asset("Theme state", theme.theme_state)}
-    ${asset("Comparison matrix", theme.comparison_matrix)}
-    ${asset("Synthesis report", theme.synthesis_report)}
-  </div>
-  ${renderMarkdown(theme.synthesis_report?.content || theme.theme_state?.content || "")}`;
 }
 
 function renderArchiveOverview(run) {
@@ -261,13 +380,8 @@ function renderArchiveOverview(run) {
     ${meta("Date", run.date)}
     ${asset("Digest", run.digest)}
   </div>
-  ${renderMarkdown(run.digest?.content || "")}`;
-}
-
-function renderMessageOverview(message) {
-  return `<div class="chat-panel">
-    ${renderChatMessages([message])}
-  </div>`;
+  ${renderMarkdown(run.digest?.content || "")}
+  ${renderDailyDebugPanel()}`;
 }
 
 function renderQuickRead(item) {
@@ -283,7 +397,8 @@ function renderMarkdownEditor(paper, docType) {
   const title = docType === "quick" ? "快读 Markdown" : "精读 Markdown";
   const placeholder = docType === "quick" ? "这里编辑 quick_read.md" : "这里编辑 deep_read.md";
   const content = record?.content || "";
-  return `<div class="split-reader" id="splitReader">
+  const canInteract = docType === "deep";
+  return `<div class="split-reader" id="splitReader" data-paper-key="${escapeHtml(paper.paper_key || "")}">
     <section class="editor-pane">
       <div class="pane-toolbar">
         <h3>${title}</h3>
@@ -299,10 +414,14 @@ function renderMarkdownEditor(paper, docType) {
     </section>
     <section class="source-pane" id="sourcePane">
       <div class="pane-toolbar">
-        <h3>原文对照</h3>
-        <button class="secondary-button" id="toggleSourcePaneButton">收起原文</button>
+        <h3 id="readerSideTitle">原文对照</h3>
+        <div class="toolbar-actions">
+          ${canInteract ? `<button class="secondary-button" id="toggleDeepInteractionButton" aria-expanded="false">精读交互</button>` : ""}
+          <button class="secondary-button" id="toggleSourcePaneButton" aria-expanded="true">收起原文</button>
+        </div>
       </div>
       <div class="source-body" id="sourceBody">${renderSourceFrame(paper)}</div>
+      ${canInteract ? renderDeepReadInteractionPanel(paper) : ""}
     </section>
   </div>`;
 }
@@ -314,51 +433,99 @@ function renderSourceFrame(paper) {
   return `<iframe class="source-frame" src="${paper.pdf.url}" title="Original PDF"></iframe>`;
 }
 
+function renderDeepReadInteractionPanel(paper) {
+  const messages = paper.interaction_messages || [];
+  const filteredMessages = filteredDeepInteractionMessages(messages);
+  return `<div class="deep-interaction-body is-hidden" id="deepInteractionBody">
+    ${renderDeepInteractionToolbar(messages, filteredMessages)}
+    <div class="chat-log deep-interaction-log" id="deepInteractionLog">${renderDeepInteractionMessages(filteredMessages)}</div>
+    <div class="deep-interaction-composer">
+      <textarea id="deepInteractionBodyInput" rows="3" placeholder="输入要交给 deep-read-interaction 的问题；可先点上方意图作为提示。"></textarea>
+      <button class="primary-button" id="sendDeepInteractionButton">触发 skill 回复</button>
+    </div>
+  </div>`;
+}
+
+function renderDeepInteractionToolbar(messages, filteredMessages) {
+  const filters = state.deepInteractionFilters;
+  return `<div class="deep-interaction-tools">
+    <div class="deep-toolbar-left">
+      <div class="deep-intent-chips" aria-label="精读交互意图筛选">
+        ${DEEP_INTERACTION_INTENTS.map((intent) => renderDeepIntentButton(intent, filters.mode)).join("")}
+      </div>
+    </div>
+    <div class="deep-toolbar-right deep-history-actions">
+      <span class="muted" id="deepInteractionFilterCount">显示 ${filteredMessages.length} / ${messages.length}</span>
+      <input class="deep-keyword-input" id="deepInteractionFilterQuery" value="${escapeHtml(filters.query)}" placeholder="关键词筛选" />
+      <button class="danger-button" id="clearDeepInteractionsButton" type="button" ${messages.length ? "" : "disabled"}>清空历史</button>
+    </div>
+  </div>`;
+}
+
+function renderDeepIntentButton(intent, activeMode) {
+  const active = activeMode === intent.mode ? " is-active" : "";
+  return `<button class="prompt-chip deep-intent-chip${active}" type="button" data-deep-mode="${escapeHtml(intent.mode)}" data-deep-template="${escapeHtml(intent.template)}">${escapeHtml(intent.label)}</button>`;
+}
+
+function deepIntentLabel(mode) {
+  return DEEP_INTERACTION_INTENTS.find((intent) => intent.mode === mode)?.label || mode || "自动判断";
+}
+
+function filteredDeepInteractionMessages(messages) {
+  const filters = state.deepInteractionFilters;
+  const query = filters.query.trim().toLowerCase();
+  return messages.filter((message) => {
+    const mode = message.interaction_mode || "follow_up";
+    if (filters.mode !== "all" && mode !== filters.mode) return false;
+    if (!query) return true;
+    return [message.body, message.reply_markdown, message.assistant_reply, mode, message.reply_status, message.forward_status, message.message_id]
+      .filter(Boolean)
+      .some((value) => String(value).toLowerCase().includes(query));
+  });
+}
+
+function renderDeepInteractionMessages(messages) {
+  if (!messages.length) return `<div class="empty-state compact"><p>暂无精读交互消息。</p></div>`;
+  const latestReplyId = [...messages].reverse().find((message) => message.reply_markdown)?.message_id;
+  return messages
+    .map((message) => `<article class="chat-message is-own">
+      <div class="chat-meta">
+        <span>你 · ${escapeHtml(deepIntentLabel(message.interaction_mode || "follow_up"))}</span>
+        <span class="deep-message-actions">
+          <span>${escapeHtml(message.created_at || "")}</span>
+          <button class="text-danger-button" type="button" data-delete-deep-message="${escapeHtml(message.message_id || "")}">删除</button>
+        </span>
+      </div>
+      <p>${escapeHtml(message.body || "")}</p>
+    </article>
+    ${
+      message.reply_markdown
+        ? `<article class="chat-message is-assistant">
+            <details class="reply-details" ${message.message_id === latestReplyId ? "open" : ""}>
+              <summary>
+                <span>Codex 回复</span>
+                <span class="badge ${message.codex_ok === false ? "warn" : "good"}">${escapeHtml(message.reply_status || message.forward_status || "")}</span>
+              </summary>
+              <div class="interaction-reply-preview">
+                ${renderMarkdown(message.reply_markdown)}
+              </div>
+            </details>
+          </article>`
+        : `<article class="chat-message is-assistant"><p>等待外部 Codex 回复。</p></article>`
+    }`)
+    .join("");
+}
+
 function renderMap(item) {
   return renderMindMap(item);
 }
 
 function renderInteraction(item) {
-  const paper = item.kind === "paper" ? item.raw : item.raw.paper_key ? paperByKey(item.raw.paper_key) : null;
-  const theme = item.kind === "theme" ? item.raw : themeById(item.raw.theme_id || "long_memory_multiturn");
-  const themeId = theme?.theme_id || item.raw.theme_id || "long_memory_multiturn";
-  const paperKey = paper?.paper_key || item.raw.paper_key || "";
-  const messages = (theme?.messages?.length ? theme.messages : state.dashboard?.messages || [])
-    .filter((message) => !themeId || message.theme_id === themeId)
-    .slice(-20);
-  return `<div class="chat-panel">
-    <div class="chat-header">
-      <div>
-        <h3>共读聊天</h3>
-        <p class="muted">消息会写入本地 outbox，供后续桥接器或 Codex 线程消费。</p>
-      </div>
-      <span class="badge">${escapeHtml(themeId)}</span>
-    </div>
-    <div class="chat-log" id="chatLog">${renderChatMessages(messages)}</div>
-    <div class="chat-composer">
-      <input id="messageTheme" value="${escapeHtml(themeId)}" aria-label="Theme ID" />
-      <input id="messagePaper" value="${escapeHtml(paperKey)}" aria-label="Paper key" placeholder="paper key" />
-      <textarea id="messageBody" rows="3" placeholder="输入要转发给共读流程的问题、判断或下一步请求。"></textarea>
-      <button class="primary-button" id="sendMessageButton">发送</button>
-    </div>
-  </div>`;
-}
-
-function renderChatMessages(messages) {
-  if (!messages.length) return `<div class="empty-state compact"><p>暂无共读消息。</p></div>`;
-  return messages
-    .map((message) => `<article class="chat-message">
-      <div class="chat-meta">
-        <span>${escapeHtml(message.sender || "local_site")}</span>
-        <span>${escapeHtml(message.created_at || "")}</span>
-      </div>
-      <p>${escapeHtml(message.body || "")}</p>
-      <div class="list-meta">
-        <span class="badge">${escapeHtml(message.forward_status || "")}</span>
-        ${message.paper_key ? `<span>${escapeHtml(message.paper_key)}</span>` : ""}
-      </div>
-    </article>`)
-    .join("");
+  return renderCoreadingWorkspace(item, {
+    dashboard: state.dashboard,
+    themeById,
+    paperByKey,
+  });
 }
 
 function bindDetailActions(item) {
@@ -397,6 +564,26 @@ function bindDetailActions(item) {
     } catch (error) {
       toast(error.message);
       event.target.value = item.raw.status;
+    }
+  });
+
+  document.querySelector("#deletePaperButton")?.addEventListener("click", async () => {
+    const paperKey = item.raw.paper_key;
+    const confirmed = window.confirm(
+      `删除 ${paperKey} 的本地派生记录？\n\n这会移除网页队列条目、workflow state、审批记录、outputs/papers 下的报告和本地缓存；不会修改 Zotero，也不会移除 Zotero todo。若 Zotero todo 仍在，下次 Daily 会重新检索并可重新快读。`,
+    );
+    if (!confirmed) return;
+    try {
+      await deletePaper(paperKey);
+      state.selectedId = null;
+      await load();
+      state.mode = "papers";
+      state.view = "overview";
+      state.selectedId = currentItems()[0]?.id || null;
+      render();
+      toast("本地文献记录已删除；Zotero todo 未修改");
+    } catch (error) {
+      toast(error.message);
     }
   });
 
@@ -453,29 +640,208 @@ function bindDetailActions(item) {
   });
 
   document.querySelector("#sendMessageButton")?.addEventListener("click", async () => {
+    const button = document.querySelector("#sendMessageButton");
     const body = document.querySelector("#messageBody").value.trim();
     const themeId = document.querySelector("#messageTheme").value.trim();
     const paperKey = document.querySelector("#messagePaper").value.trim();
+    const intent = document.querySelector("#messageIntent")?.value || "open_question";
+    const previousLabel = button?.textContent || "";
     try {
-      await sendCoreadingMessage({ themeId, paperKey, body });
+      if (button) {
+        button.disabled = true;
+        button.textContent = "Codex 调用中...";
+      }
+      toast("正在调用外部 Codex...");
+      await sendCoreadingMessage({ themeId, paperKey, body, intent, sourceView: state.view });
       await load();
       state.mode = "themes";
       state.selectedId = themeId;
       state.view = "interact";
       render();
-      toast("消息已写入本地共读队列");
+      toast("Codex 回复已更新到共读聊天");
     } catch (error) {
       toast(error.message);
+    } finally {
+      if (button) {
+        button.disabled = false;
+        button.textContent = previousLabel;
+      }
+    }
+  });
+
+  document.querySelector("#toggleDeepInteractionButton")?.addEventListener("click", () => {
+    const split = document.querySelector("#splitReader");
+    setReaderSideMode(split.classList.contains("interaction-open") ? "source" : "interaction");
+  });
+
+  document.querySelectorAll("[data-deep-template]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const input = document.querySelector("#deepInteractionBodyInput");
+      const nextMode = state.deepInteractionFilters.mode === button.dataset.deepMode ? "all" : button.dataset.deepMode || "all";
+      state.deepInteractionFilters.mode = nextMode;
+      input?.focus();
+      refreshDeepInteractionLog(item.raw);
+    });
+  });
+
+  bindDeepInteractionHistoryControls(item.raw);
+
+  document.querySelector("#sendDeepInteractionButton")?.addEventListener("click", async () => {
+    const button = document.querySelector("#sendDeepInteractionButton");
+    const body = document.querySelector("#deepInteractionBodyInput")?.value.trim() || "";
+    const interactionMode = state.deepInteractionFilters.mode === "all" ? "auto" : state.deepInteractionFilters.mode;
+    const previousLabel = button?.textContent || "";
+    try {
+      if (button) {
+        button.disabled = true;
+        button.textContent = "Codex 调用中...";
+      }
+      toast("正在调用外部 Codex...");
+      await sendDeepReadInteractionMessage({
+        paperKey: item.raw.paper_key,
+        body,
+        interactionMode,
+        sourceView: "deep_read_interaction_panel",
+      });
+      await load();
+      state.mode = "papers";
+      state.selectedId = item.raw.paper_key;
+      state.view = "deep";
+      render();
+      setReaderSideMode("interaction");
+      toast("Codex 回复已更新到交互工作台");
+    } catch (error) {
+      toast(error.message);
+    } finally {
+      if (button) {
+        button.disabled = false;
+        button.textContent = previousLabel;
+      }
     }
   });
 
   document.querySelector("#toggleSourcePaneButton")?.addEventListener("click", (event) => {
     const split = document.querySelector("#splitReader");
-    split.classList.toggle("source-collapsed");
-    event.currentTarget.textContent = split.classList.contains("source-collapsed") ? "展开原文" : "收起原文";
+    if (split.classList.contains("interaction-open") || split.classList.contains("source-collapsed")) {
+      setReaderSideMode("source");
+    } else {
+      setReaderSideMode("collapsed");
+    }
   });
 
   bindMindMapEditor();
+  bindCoreadingWorkspace();
+  bindCoreadingSaveActions(item);
+}
+
+function bindCoreadingSaveActions(item) {
+  document.querySelectorAll("[data-save-coreading-markdown]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const panel = button.closest("[data-coreading-panel]");
+      const editor = panel?.querySelector("[data-coreading-markdown-editor]");
+      const path = button.dataset.path || "";
+      if (!path || !editor) {
+        toast("未找到可保存的共读 Markdown");
+        return;
+      }
+      try {
+        await saveMarkdown({ path, content: markdownFromRendered(editor) });
+        await load();
+        state.view = "interact";
+        state.selectedId = item.id;
+        render();
+        toast("共读 Markdown 已保存");
+      } catch (error) {
+        toast(error.message);
+      }
+    });
+  });
+}
+
+function refreshDeepInteractionLog(paper) {
+  const messages = paper.interaction_messages || [];
+  const filtered = filteredDeepInteractionMessages(messages);
+  const log = document.querySelector("#deepInteractionLog");
+  const count = document.querySelector("#deepInteractionFilterCount");
+  if (log) log.innerHTML = renderDeepInteractionMessages(filtered);
+  if (count) count.textContent = `显示 ${filtered.length} / ${messages.length}`;
+  document.querySelectorAll("[data-deep-mode]").forEach((button) => {
+    button.classList.toggle("is-active", button.dataset.deepMode === state.deepInteractionFilters.mode);
+  });
+  bindDeepInteractionDeleteButtons(paper);
+}
+
+function bindDeepInteractionHistoryControls(paper) {
+  const messages = paper.interaction_messages || [];
+  document.querySelector("#deepInteractionFilterQuery")?.addEventListener("input", (event) => {
+    state.deepInteractionFilters.query = event.target.value;
+    refreshDeepInteractionLog(paper);
+  });
+  document.querySelector("#clearDeepInteractionsButton")?.addEventListener("click", async () => {
+    if (!messages.length) return;
+    if (!window.confirm(`清空 ${paper.paper_key} 的全部精读交互历史？此操作会重写本地 JSONL。`)) return;
+    try {
+      await clearDeepReadInteractions({ paperKey: paper.paper_key });
+      await load();
+      state.mode = "papers";
+      state.selectedId = paper.paper_key;
+      state.view = "deep";
+      render();
+      setReaderSideMode("interaction");
+      toast("精读交互历史已清空");
+    } catch (error) {
+      toast(error.message);
+    }
+  });
+  bindDeepInteractionDeleteButtons(paper);
+}
+
+function bindDeepInteractionDeleteButtons(paper) {
+  document.querySelectorAll("[data-delete-deep-message]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const messageId = button.dataset.deleteDeepMessage;
+      if (!messageId) return;
+      if (!window.confirm("删除这一轮精读交互问答？")) return;
+      try {
+        await deleteDeepReadInteractionMessage({ paperKey: paper.paper_key, messageId });
+        await load();
+        state.mode = "papers";
+        state.selectedId = paper.paper_key;
+        state.view = "deep";
+        render();
+        setReaderSideMode("interaction");
+        toast("精读交互消息已删除");
+      } catch (error) {
+        toast(error.message);
+      }
+    });
+  });
+}
+
+function setReaderSideMode(mode) {
+  const split = document.querySelector("#splitReader");
+  const sourceButton = document.querySelector("#toggleSourcePaneButton");
+  const interactionButton = document.querySelector("#toggleDeepInteractionButton");
+  const title = document.querySelector("#readerSideTitle");
+  if (!split || !sourceButton) return;
+
+  split.classList.toggle("source-collapsed", mode === "collapsed");
+  split.classList.toggle("interaction-open", mode === "interaction");
+
+  const sourceVisible = mode === "source";
+  sourceButton.textContent = sourceVisible ? "收起原文" : "展开原文";
+  sourceButton.setAttribute("aria-expanded", String(sourceVisible));
+  sourceButton.title = sourceVisible ? "收起原文对照" : "展开原文对照";
+
+  if (interactionButton) {
+    const interactionVisible = mode === "interaction";
+    interactionButton.textContent = interactionVisible ? "返回原文" : "精读交互";
+    interactionButton.setAttribute("aria-expanded", String(interactionVisible));
+  }
+  if (title) {
+    const paperKey = split.dataset.paperKey || "";
+    title.textContent = mode === "interaction" && paperKey ? `精读交互 · Paper ${paperKey}` : mode === "interaction" ? "精读交互" : "原文对照";
+  }
 }
 
 async function handleDailyTodo() {
@@ -483,7 +849,14 @@ async function handleDailyTodo() {
 }
 
 async function handleDailyWorkflow() {
+  const previousLabel = dailyWorkflowButton?.textContent || "";
   try {
+    if (dailyWorkflowButton) {
+      dailyWorkflowButton.disabled = true;
+      dailyWorkflowButton.textContent = "Daily 生成中...";
+    }
+    setOptimisticDailyRunningStatus();
+    startDailyStatusPolling();
     await triggerDailyArchive();
     await load();
     state.mode = "archives";
@@ -492,7 +865,58 @@ async function handleDailyWorkflow() {
     render();
     toast("已生成当日归档并同步本地状态");
   } catch (error) {
+    await refreshDashboardQuietly();
     toast(error.message);
+  } finally {
+    stopDailyStatusPolling();
+    if (dailyWorkflowButton) {
+      dailyWorkflowButton.disabled = false;
+      dailyWorkflowButton.textContent = previousLabel;
+    }
+  }
+}
+
+function setOptimisticDailyRunningStatus() {
+  if (!state.dashboard) return;
+  dailyRunStatusCollapsed = false;
+  window.localStorage.setItem("dailyRunStatusCollapsed", "false");
+  const now = new Date().toISOString();
+  state.dashboard.daily_run_status = {
+    ...(state.dashboard.daily_run_status || {}),
+    status: "running",
+    step: "request_started",
+    message: "Daily 生成中：正在刷新 Zotero todo 队列并调用 $daily-paper-triage。",
+    updated_at: now,
+    logs: [
+      ...((state.dashboard.daily_run_status || {}).logs || []),
+      {
+        created_at: now,
+        step: "request_started",
+        message: "网页端已发起 Daily workflow。",
+      },
+    ].slice(-80),
+  };
+  renderDailyRunStatus();
+  if (state.mode === "today" || state.mode === "archives") renderDetail();
+}
+
+function startDailyStatusPolling() {
+  stopDailyStatusPolling();
+  dailyStatusPoll = window.setInterval(refreshDashboardQuietly, 2500);
+}
+
+function stopDailyStatusPolling() {
+  if (!dailyStatusPoll) return;
+  window.clearInterval(dailyStatusPoll);
+  dailyStatusPoll = null;
+}
+
+async function refreshDashboardQuietly() {
+  try {
+    setDashboard(await fetchDashboard());
+    render();
+  } catch {
+    // Keep the visible running state if the temporary status fetch fails.
   }
 }
 
@@ -519,7 +943,33 @@ function blockToMarkdown(node) {
 }
 
 function inlineMarkdown(node) {
-  return node.textContent.replace(/\n{2,}/g, "\n").trim();
+  return [...node.childNodes].map(nodeToMarkdown).join("").replace(/\n{2,}/g, "\n").trim();
+}
+
+function nodeToMarkdown(node) {
+  if (node.nodeType === Node.TEXT_NODE) return node.textContent || "";
+  if (node.nodeType !== Node.ELEMENT_NODE) return "";
+  const tag = node.tagName.toLowerCase();
+  if (tag === "br") return "\n";
+  if (tag === "code") return `\`${node.textContent || ""}\``;
+  if (tag === "strong" || tag === "b") return `**${node.textContent || ""}**`;
+  if (tag === "a") return `[${node.textContent || node.href}](${node.getAttribute("href") || ""})`;
+  if (tag === "img") {
+    const alt = node.getAttribute("alt") || "image";
+    const src = node.dataset.markdownSrc || markdownPathFromImageSrc(node.getAttribute("src") || "");
+    return `![${alt}](<${src}>)`;
+  }
+  return [...node.childNodes].map(nodeToMarkdown).join("");
+}
+
+function markdownPathFromImageSrc(src) {
+  try {
+    const url = new URL(src, window.location.origin);
+    if (url.pathname === "/api/file") return url.searchParams.get("path") || src;
+  } catch {
+    return src;
+  }
+  return src;
 }
 
 function tableToMarkdown(table) {
@@ -570,7 +1020,7 @@ function jsonBlock(value) {
 
 function statusClass(status = "") {
   if (status.includes("done") || status.includes("approved") || status.includes("ready") || status.includes("queued_for")) return "good";
-  if (status.includes("missing") || status.includes("open")) return "warn";
+  if (status.includes("missing") || status.includes("open") || status.includes("failed") || status.includes("error") || status.includes("timeout")) return "warn";
   return "";
 }
 

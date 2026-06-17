@@ -67,8 +67,19 @@ single_paper_deep_read = "skills/single-paper-deep-read/SKILL.md"
 deep_read_interaction = "skills/deep-read-interaction/SKILL.md"
 theme_coreading = "skills/theme-coreading/SKILL.md"
 
+[codex]
+command = "C:/Users/tekhnec/AppData/Local/OpenAI/Codex/bin/f1c7ee7a13db5fed/codex.exe"
+exec_args = ["exec", "--sandbox", "workspace-write", "--ephemeral", "-C", "C:/Users/tekhnec/.agents/paper-reading-skills"]
+timeout_seconds = 1800
+run_daily_from_site = true
+daily_fallback_on_codex_failure = false
+
+[runtime]
+python_path = "C:/Users/tekhnec/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe"
+
 [queue]
 todo_tag = "todo"
 daily_limit = 5
+refresh_from_zotero_on_daily = true
 abstract_policy = "truncate"
 abstract_max_chars = 600

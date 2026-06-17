@@ -5,6 +5,10 @@ export const state = {
   selectedId: null,
   dashboard: null,
   sidebarCollapsed: false,
+  deepInteractionFilters: {
+    mode: "all",
+    query: "",
+  },
 };
 
 export function setDashboard(dashboard) {
@@ -78,7 +82,12 @@ export function normalizeItems(dashboard, mode) {
       title: theme.theme_id,
       subtitle: "Theme co-reading",
       status: theme.synthesis_report ? "synthesis_ready" : "state_only",
-      searchText: [theme.theme_state?.content, theme.comparison_matrix?.content, theme.synthesis_report?.content].join(" "),
+      searchText: [
+        theme.theme_state?.content,
+        theme.comparison_matrix?.content,
+        theme.synthesis_report?.content,
+        ...(theme.coreading_outputs || []).map((output) => output.file?.content),
+      ].join(" "),
       raw: theme,
     }));
   }
