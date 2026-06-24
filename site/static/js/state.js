@@ -3,6 +3,7 @@ export const state = {
   view: "overview",
   query: "",
   selectedId: null,
+  paperFilter: "all",
   dashboard: null,
   sidebarCollapsed: false,
   deepInteractionFilters: {
@@ -21,13 +22,30 @@ export function setDashboard(dashboard) {
 export function currentItems() {
   if (!state.dashboard) return [];
   const query = state.query.trim().toLowerCase();
-  const items = normalizeItems(state.dashboard, state.mode);
+  let items = normalizeItems(state.dashboard, state.mode);
+  if (state.mode === "papers") {
+    items = items.filter((item) => matchesPaperFilter(item.raw, state.paperFilter));
+  }
   if (!query) return items;
   return items.filter((item) =>
     [item.title, item.id, item.subtitle, item.status, item.searchText]
       .filter(Boolean)
       .some((value) => String(value).toLowerCase().includes(query)),
   );
+}
+
+function matchesPaperFilter(paper, filter) {
+  if (!filter || filter === "all") return true;
+  if (filter === "pending_approval") return isPendingDeepReadApproval(paper);
+  if (filter === "deep_read_done") return paper.status === "deep_read_done" || Boolean(paper.deep_read);
+  if (filter === "quick_read_done") return paper.status === "quick_read_done";
+  if (filter === "queued") return !paper.status || paper.status === "queued";
+  return paper.status === filter;
+}
+
+function isPendingDeepReadApproval(paper) {
+  if (!paper || paper.approval || paper.deep_read || paper.status === "deep_read_done") return false;
+  return paper.status === "deep_read_candidate" || paper.recommended_action === "deep_read_candidate";
 }
 
 export function selectedItem() {
@@ -72,7 +90,8 @@ export function normalizeItems(dashboard, mode) {
       searchText: [todo.paper_key, todo.theme_id, todo.reason].filter(Boolean).join(" "),
       raw: todo,
     }));
-    return [...latest, ...todos];
+    const messages = normalizeMessages(dashboard);
+    return [...latest, ...todos, ...messages];
   }
 
   if (mode === "themes") {
@@ -105,15 +124,7 @@ export function normalizeItems(dashboard, mode) {
   }
 
   if (mode === "messages") {
-    return dashboard.messages.map((message) => ({
-      id: message.message_id,
-      kind: "message",
-      title: message.body.slice(0, 80),
-      subtitle: [message.theme_id, message.forward_status].filter(Boolean).join(" · "),
-      status: message.forward_status,
-      searchText: [message.body, message.paper_key, message.theme_id].join(" "),
-      raw: message,
-    }));
+    return normalizeMessages(dashboard);
   }
 
   return dashboard.papers.map((paper) => ({
@@ -124,5 +135,17 @@ export function normalizeItems(dashboard, mode) {
     status: paper.status || "queued",
     searchText: [paper.recommended_action, paper.decision_label, paper.evidence_status].join(" "),
     raw: paper,
+  }));
+}
+
+function normalizeMessages(dashboard) {
+  return (dashboard.messages || []).map((message) => ({
+    id: message.message_id,
+    kind: "message",
+    title: message.body.slice(0, 80),
+    subtitle: [message.theme_id, message.forward_status].filter(Boolean).join(" · "),
+    status: message.forward_status,
+    searchText: [message.body, message.paper_key, message.theme_id].join(" "),
+    raw: message,
   }));
 }

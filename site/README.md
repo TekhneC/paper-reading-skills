@@ -1,4 +1,4 @@
-# Paper Reading Local Site
+﻿# Paper Reading Local Site
 
 This is a zero-install local web console for the paper-reading skill cluster.
 
@@ -60,3 +60,15 @@ separate database-backed application.
 ## Design Decisions
 
 See `site/DESIGN_DECISIONS.md`.
+
+## Governance
+
+Site-level governance is maintained in:
+
+- `governance/site_governance.md`
+- `governance/decisions/`
+- `governance/explorations/`
+
+Do not add long-form design decisions to `site/DESIGN_DECISIONS.md`.
+
+

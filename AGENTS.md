@@ -1,4 +1,4 @@
-# AGENTS.md
+﻿# AGENTS.md
 
 ## Project scope
 
@@ -20,6 +20,21 @@ The repository manages:
 * theme-reading packets and outputs
 
 This repository is not the Zotero data directory. Do not store original Zotero PDFs or the original Zotero database in this repository.
+
+## Governance layer
+
+This repository has a lightweight governance layer for human-AI collaborative development.
+
+Read order:
+1. `AGENTS.md`
+2. `PROJECT_STATE.md`
+3. `governance/README.md`
+
+`AGENTS.md` defines repository-level safety boundaries.
+`PROJECT_STATE.md` summarizes the current project state.
+`governance/` maintains project consensus, design decisions, explorations, and development priorities.
+
+Do not duplicate AGENTS.md rules in governance documents.
 
 ---
 
@@ -218,12 +233,15 @@ Expected repository structure:
 ```text
 ~/.agents/paper-reading-skills/
 ├─ AGENTS.md
+├─ PROJECT_STATE.md
 ├─ config/
 ├─ skills/
 ├─ scripts/
 ├─ templates/
 ├─ state/
-└─ outputs/
+├─ outputs/
+├─ site/
+└─ governance/
 ```
 
 Directory roles:
@@ -235,6 +253,8 @@ scripts/     Local workflow scripts.
 templates/   Markdown report templates.
 state/       Machine-readable workflow state.
 outputs/     Human-readable generated reports.
+site/        Local web console implementation.
+governance/  Project consensus, design decisions, explorations, and priorities.
 ```
 
 ---
@@ -454,3 +474,6 @@ If this file conflicts with a specific skill, follow this file for global safety
 Follow the skill file for task-specific procedure and output structure.
 
 If a required path, queue source, theme packet, or approval record is missing, report the missing item instead of guessing.
+
+
+

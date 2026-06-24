@@ -22,7 +22,7 @@ import {
 import { currentItems, jumpTo, paperByKey, selectedItem, setDashboard, state, themeById } from "./state.js";
 
 const appShell = document.querySelector("#appShell");
-const summaryGrid = document.querySelector("#summaryGrid");
+const paperFilterBar = document.querySelector("#paperFilterBar");
 const itemList = document.querySelector("#itemList");
 const detailHeader = document.querySelector("#detailHeader");
 const contentPanel = document.querySelector("#contentPanel");
@@ -35,6 +35,80 @@ const modeButtons = [...document.querySelectorAll(".segment")];
 const viewButtons = [...document.querySelectorAll(".view-tab")];
 let dailyStatusPoll = null;
 let dailyRunStatusCollapsed = window.localStorage.getItem("dailyRunStatusCollapsed") === "true";
+
+const MODE_TABS = [
+  [
+    "today",
+    "待办",
+    (dashboard) => (dashboard?.latest_daily ? 1 : 0) + (dashboard?.todos?.length || 0) + (dashboard?.messages?.length || 0),
+  ],
+  ["papers", "文献", (dashboard) => dashboard?.papers?.length || 0],
+  ["themes", "共读", (dashboard) => dashboard?.themes?.length || 0],
+  ["archives", "归档", (dashboard) => dashboard?.daily_runs?.length || 0],
+];
+
+const PAPER_FILTERS = [
+  ["all", "全部", () => true],
+  ["quick_read_done", "快读", (paper) => paper.status === "quick_read_done"],
+  ["pending_approval", "待批准", (paper) => isPendingDeepReadApproval(paper)],
+  ["deep_read_done", "已精读", (paper) => paper.status === "deep_read_done" || Boolean(paper.deep_read)],
+  ["queued", "待快读", (paper) => !paper.status || paper.status === "queued"],
+];
+
+const KIND_LABELS = {
+  paper: "文献",
+  todo: "待办",
+  theme: "共读主题",
+  archive: "每日归档",
+  "archive-summary": "当日阅读",
+  message: "共读消息",
+};
+
+const STATUS_LABELS = {
+  queued: "待快读",
+  quick_read_done: "快读完成",
+  deep_read_candidate: "精读候选",
+  deep_read_approved: "已批准精读",
+  deep_read_done: "精读完成",
+  archived: "已归档",
+  ready: "已生成",
+  missing: "缺失",
+  open: "待处理",
+  completed: "已完成",
+  failed: "失败",
+  running: "运行中",
+  synthesis_ready: "综述就绪",
+  state_only: "仅有状态",
+  digest_ready: "归档就绪",
+  metadata_only: "仅有元数据",
+  queued_for_deep_read: "已进入精读队列",
+};
+
+const ACTION_LABELS = {
+  deep_read_candidate: "建议精读",
+  approve_deep_read: "建议精读",
+  quick_read_only: "仅快读",
+  archive: "建议归档",
+  no_action: "暂无后续动作",
+  daily_triage: "生成当日归档",
+};
+
+const DECISION_LABELS = {
+  strong_candidate: "强候选",
+  candidate: "候选",
+  quick_read_only: "仅快读",
+  already_done: "已完成",
+  not_recommended: "暂不推荐",
+};
+
+const EVIDENCE_LABELS = {
+  page_numbers_available: "页码证据可用",
+  abstract_metadata: "摘要元数据",
+  abstract_only: "仅摘要证据",
+  extracted: "已抽取正文",
+  missing: "缺失",
+  failed: "抽取失败",
+};
 
 const DEEP_INTERACTION_INTENTS = [
   {
@@ -124,19 +198,44 @@ function setActiveButtons() {
 }
 
 function renderSummary() {
-  const summary = state.dashboard?.summary || {};
-  const metrics = [
-    ["Todo", summary.todo_count || 0],
-    ["文献", summary.paper_count || 0],
-    ["已批", summary.approved_count || 0],
-    ["精读", summary.deep_read_count || 0],
-    ["归档", summary.archive_count || 0],
-    ["消息", summary.message_count || 0],
-  ];
-  summaryGrid.innerHTML = metrics
-    .map(([label, value]) => `<div class="metric"><strong>${value}</strong><span>${label}</span></div>`)
-    .join("");
+  renderModeCounts();
+  renderPaperFilterBar();
   renderDailyRunStatus();
+}
+
+function renderModeCounts() {
+  MODE_TABS.forEach(([mode, label, countFn]) => {
+    const button = modeButtons.find((candidate) => candidate.dataset.mode === mode);
+    if (!button) return;
+    button.innerHTML = `<span class="segment-label">${escapeHtml(label)}</span><strong class="segment-count">${countFn(state.dashboard || {})}</strong>`;
+  });
+}
+
+function renderPaperFilterBar() {
+  if (!paperFilterBar) return;
+  if (state.mode !== "papers") {
+    paperFilterBar.innerHTML = "";
+    paperFilterBar.hidden = true;
+    return;
+  }
+
+  paperFilterBar.hidden = false;
+  const papers = state.dashboard?.papers || [];
+  paperFilterBar.innerHTML = PAPER_FILTERS.map(([filter, label, predicate]) => {
+    const active = state.paperFilter === filter ? " is-active" : "";
+    const count = papers.filter(predicate).length;
+    return `<button class="filter-chip${active}" type="button" data-paper-filter="${escapeHtml(filter)}">
+      <span>${escapeHtml(label)}</span><strong>${count}</strong>
+    </button>`;
+  }).join("");
+
+  paperFilterBar.querySelectorAll("[data-paper-filter]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.paperFilter = button.dataset.paperFilter || "all";
+      state.selectedId = currentItems()[0]?.id || null;
+      render();
+    });
+  });
 }
 
 function renderDailyRunStatus() {
@@ -241,9 +340,9 @@ function renderList() {
       return `<button class="list-item${active}" data-id="${escapeHtml(item.id)}">
         <span class="list-title">${escapeHtml(item.title)}</span>
         <span class="list-meta">
-          <span>${escapeHtml(item.id)}</span>
+          <span class="list-id">${escapeHtml(item.id)}</span>
           ${item.subtitle ? `<span>${escapeHtml(item.subtitle)}</span>` : ""}
-          <span class="badge ${statusClass(item.status)}">${escapeHtml(item.status || "")}</span>
+          <span class="badge ${statusClass(item.status)}" title="${escapeHtml(item.status || "")}">${escapeHtml(labelForStatus(item.status))}</span>
         </span>
       </button>`;
     })
@@ -287,22 +386,27 @@ function renderHeader(item) {
   const isPaper = item.kind === "paper";
   const approved = isPaper && raw.approval;
   const canApprove = isPaper && !approved;
+  const nextAction = isPaper ? nextActionForPaper(raw) : "";
   detailHeader.innerHTML = `<div class="title-row">
     <div>
-      <p class="eyebrow">${escapeHtml(item.kind)}</p>
+      <p class="eyebrow">${escapeHtml(kindLabel(item.kind))}</p>
       <h2>${escapeHtml(item.title)}</h2>
       <div class="list-meta">
-        <span class="badge ${statusClass(item.status)}">${escapeHtml(item.status || "")}</span>
-        ${isPaper && raw.recommended_action ? `<span class="badge">${escapeHtml(raw.recommended_action)}</span>` : ""}
-        ${approved ? `<span class="badge good">deep_read_approved</span>` : ""}
+        <span class="badge ${statusClass(item.status)}" title="${escapeHtml(item.status || "")}">${escapeHtml(labelForStatus(item.status))}</span>
+        ${isPaper && nextAction ? `<span class="badge neutral" title="${escapeHtml(raw.recommended_action || nextAction)}">${escapeHtml(nextAction)}</span>` : ""}
+        ${approved ? `<span class="badge good">已批准精读</span>` : ""}
       </div>
     </div>
-    <div class="actions">
-      ${item.kind === "todo" ? `<button class="primary-button" id="handleTodoButton">${todoActionLabel(item.raw)}</button>` : ""}
-      ${canApprove ? `<button class="primary-button" id="approveButton">批准精读</button>` : ""}
-      ${isPaper ? renderStateSelect(raw) : ""}
-      ${isPaper ? `<button class="danger-button" id="deletePaperButton" type="button">删除文献</button>` : ""}
-      <button class="secondary-button" id="copyIdButton">复制 ID</button>
+    <div class="header-actions">
+      <div class="primary-actions">
+        ${item.kind === "todo" ? `<button class="primary-button" id="handleTodoButton">${todoActionLabel(item.raw)}</button>` : ""}
+        ${canApprove ? `<button class="primary-button" id="approveButton">批准精读</button>` : ""}
+        ${isPaper ? renderStateSelect(raw) : ""}
+      </div>
+      <div class="secondary-actions">
+        <button class="secondary-button" id="copyIdButton">复制 ID</button>
+        ${isPaper ? `<button class="danger-button" id="deletePaperButton" type="button">删除本地记录</button>` : ""}
+      </div>
     </div>
   </div>`;
 }
@@ -310,16 +414,17 @@ function renderHeader(item) {
 function renderStateSelect(paper) {
   const states = ["queued", "quick_read_done", "deep_read_candidate", "deep_read_approved", "deep_read_done"];
   return `<label class="state-picker">
-    <span>状态</span>
+    <span>阅读状态</span>
     <select id="stateSelect">
-      ${states.map((status) => `<option value="${status}" ${paper.status === status ? "selected" : ""}>${status}</option>`).join("")}
+      ${states
+        .map((status) => `<option value="${status}" ${paper.status === status ? "selected" : ""}>${labelForStatus(status)}</option>`)
+        .join("")}
     </select>
   </label>`;
 }
 
 function todoActionLabel(todo) {
-  if (todo.action === "daily_triage") return "生成当日归档";
-  return "处理该事项";
+  return ACTION_LABELS[todo.action] || "处理该事项";
 }
 
 function renderOverview(item) {
@@ -328,28 +433,45 @@ function renderOverview(item) {
   if (item.kind === "theme") return renderThemeOverview(item.raw);
   if (item.kind === "message") return renderMessageOverview(item.raw);
   const paper = item.raw;
-  return `<div class="meta-grid">
-    ${meta("Paper key", paper.paper_key)}
-    ${meta("Year", paper.year)}
-    ${meta("Venue", paper.venue)}
-    ${meta("Status", paper.status)}
-    ${meta("Evidence", paper.evidence_status)}
-    ${meta("PDF", paper.pdf?.available ? "available" : "missing")}
-  </div>
-  <h3>阅读资产</h3>
-  <div class="meta-grid">
-    ${asset("Quick read", paper.quick_read)}
-    ${asset("Deep read", paper.deep_read)}
-    ${asset("Approval", paper.approval ? { path: `state/approvals/${paper.paper_key}.json` } : null)}
-    ${asset("Workflow state", paper.workflow_state?.updated_at ? { path: "state/workflow_state.json" } : null)}
-  </div>
-  <h3>机器摘要</h3>
-  ${jsonBlock({
-    recommended_action: paper.recommended_action,
-    decision_label: paper.decision_label,
-    suggested_deep_read_focus: paper.quick_read_json?.suggested_deep_read_focus,
-    key_takeaway: paper.deep_read_json?.key_takeaway,
-  })}`;
+  return `<div class="overview-stack">
+    <section class="overview-section">
+      <div class="section-heading">
+        <h3>文献概况</h3>
+        <span class="badge ${paper.pdf?.available ? "good" : "warn"}">${paper.pdf?.available ? "PDF 可用" : "PDF 缺失"}</span>
+      </div>
+      <div class="meta-grid">
+        ${meta("Paper key", paper.paper_key)}
+        ${meta("年份", paper.year)}
+        ${meta("会议 / 期刊", paper.venue)}
+        ${meta("阅读状态", labelForStatus(paper.status))}
+        ${meta("证据状态", labelForEvidence(paper.evidence_status))}
+      </div>
+    </section>
+
+    <section class="overview-section">
+      <div class="section-heading">
+        <h3>下一步判断</h3>
+      </div>
+      ${insightList([
+        ["建议动作", nextActionForPaper(paper)],
+        ["判定标签", labelForDecision(paper.decision_label)],
+        ["精读关注点", paper.quick_read_json?.suggested_deep_read_focus],
+        ["精读要点", paper.deep_read_json?.key_takeaway],
+      ])}
+    </section>
+
+    <section class="overview-section">
+      <div class="section-heading">
+        <h3>阅读资产</h3>
+      </div>
+      <div class="asset-grid">
+        ${asset("快读报告", paper.quick_read)}
+        ${asset("精读报告", paper.deep_read)}
+        ${asset("审批记录", paper.approval ? { path: `state/approvals/${paper.paper_key}.json` } : null)}
+        ${asset("流程状态", paper.workflow_state?.updated_at ? { path: "state/workflow_state.json" } : null)}
+      </div>
+    </section>
+  </div>`;
 }
 
 function renderTodoOverview(todo) {
@@ -997,10 +1119,10 @@ function mindMapTargetId(item) {
 
 function renderPaperMini(paper) {
   return `<div class="meta-grid">
-    ${meta("Title", paper.title)}
-    ${meta("Status", paper.status)}
-    ${meta("Recommendation", paper.recommended_action)}
-    ${meta("Evidence", paper.evidence_status)}
+    ${meta("标题", paper.title)}
+    ${meta("阅读状态", labelForStatus(paper.status))}
+    ${meta("建议动作", nextActionForPaper(paper))}
+    ${meta("证据状态", labelForEvidence(paper.evidence_status))}
   </div>`;
 }
 
@@ -1011,11 +1133,68 @@ function meta(label, value) {
 function asset(label, record) {
   const value = record?.path || "missing";
   const cls = record ? "good" : "warn";
-  return `<div class="meta-cell"><span>${escapeHtml(label)}</span><span class="badge ${cls}">${escapeHtml(value)}</span></div>`;
+  return `<div class="asset-cell"><span>${escapeHtml(label)}</span><strong class="badge ${cls}">${escapeHtml(record ? "已生成" : "缺失")}</strong><small>${escapeHtml(value)}</small></div>`;
+}
+
+function insightList(rows) {
+  return `<dl class="insight-list">
+    ${rows
+      .map(
+        ([label, value]) => `<div class="insight-row">
+          <dt>${escapeHtml(label)}</dt>
+          <dd>${renderInsightValue(value)}</dd>
+        </div>`,
+      )
+      .join("")}
+  </dl>`;
+}
+
+function renderInsightValue(value) {
+  if (Array.isArray(value)) {
+    if (!value.length) return "未记录";
+    return `<ul class="compact-list">${value.map((item) => `<li>${escapeHtml(item || "未记录")}</li>`).join("")}</ul>`;
+  }
+  return escapeHtml(value || "未记录");
 }
 
 function jsonBlock(value) {
   return `<pre><code>${escapeHtml(JSON.stringify(value, null, 2))}</code></pre>`;
+}
+
+function kindLabel(kind = "") {
+  return KIND_LABELS[kind] || kind || "项目";
+}
+
+function labelForStatus(status = "") {
+  if (!status) return "未记录";
+  return STATUS_LABELS[status] || status;
+}
+
+function labelForAction(action = "") {
+  if (!action) return "未记录";
+  return ACTION_LABELS[action] || action;
+}
+
+function isPendingDeepReadApproval(paper) {
+  if (!paper || paper.approval || paper.deep_read || paper.status === "deep_read_done") return false;
+  return paper.status === "deep_read_candidate" || paper.recommended_action === "deep_read_candidate";
+}
+
+function nextActionForPaper(paper) {
+  if (!paper) return "未记录";
+  if (paper.status === "deep_read_done") return "交互精读 / 纳入共读";
+  if (paper.status === "deep_read_approved") return "继续精读";
+  return labelForAction(paper.recommended_action);
+}
+
+function labelForDecision(decision = "") {
+  if (!decision) return "未记录";
+  return DECISION_LABELS[decision] || decision;
+}
+
+function labelForEvidence(evidence = "") {
+  if (!evidence) return "未记录";
+  return EVIDENCE_LABELS[evidence] || evidence;
 }
 
 function statusClass(status = "") {

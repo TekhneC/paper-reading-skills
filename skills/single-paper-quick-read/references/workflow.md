@@ -18,6 +18,7 @@ When handed off from daily triage, prefer the matching queue entry for initial m
 Use `../../scripts/extract_quick_read_source.py <paper_key>` to locate the read-only PDF and create derived text caches. Prefer default dual extraction:
 
 ```text
+<paper_key>.source.json
 <paper_key>.flow.txt
 <paper_key>.layout.txt
 ```

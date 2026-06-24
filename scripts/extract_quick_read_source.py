@@ -388,12 +388,10 @@ def main() -> int:
         text_mode=args.text_mode,
     )
     rendered = json.dumps(bundle, ensure_ascii=False, indent=2)
-
-    if args.output:
-        output_path = args.output.expanduser()
-        output_path.parent.mkdir(parents=True, exist_ok=True)
-        output_path.write_text(rendered + "\n", encoding="utf-8")
-    else:
+    output_path = args.output.expanduser() if args.output else cache_dir / f"{args.paper_key}.source.json"
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text(rendered + "\n", encoding="utf-8")
+    if not args.output:
         print(rendered)
     return 0
 
