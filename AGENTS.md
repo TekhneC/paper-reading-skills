@@ -218,7 +218,6 @@ Expected repository structure:
 ```text
 ~/.agents/paper-reading-skills/
 ├─ AGENTS.md
-├─ README.md
 ├─ config/
 ├─ skills/
 ├─ scripts/
@@ -355,7 +354,6 @@ Commit:
 
 ```text
 AGENTS.md
-README.md
 config/
 skills/
 scripts/

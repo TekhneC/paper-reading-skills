@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Paper Reading Console</title>
+    <link rel="stylesheet" href="/styles.css?v=20260617-workflow-bridge" />
+  </head>
+  <body>
+    <div class="app-shell" id="appShell">
+      <aside class="sidebar" id="sidebar">
+        <header class="brand">
+          <button class="icon-button" id="sidebarToggle" title="收起边栏" aria-label="收起边栏">☰</button>
+          <div class="brand-text">
+            <p class="eyebrow">Local Workflow</p>
+            <h1>Paper Reading</h1>
+          </div>
+          <button class="icon-button" id="refreshButton" title="刷新数据" aria-label="刷新数据">↻</button>
+        </header>
+
+        <div class="sidebar-scroll" id="sidebarScroll">
+          <section class="summary-grid" id="summaryGrid" aria-label="数据概览"></section>
+
+          <div class="segmented" role="tablist" aria-label="内容类型">
+            <button class="segment is-active" data-mode="today" role="tab">今日</button>
+            <button class="segment" data-mode="papers" role="tab">文献</button>
+            <button class="segment" data-mode="themes" role="tab">共读</button>
+            <button class="segment" data-mode="archives" role="tab">归档</button>
+            <button class="segment" data-mode="messages" role="tab">消息</button>
+          </div>
+
+          <label class="search-box">
+            <span>搜索</span>
+            <input id="searchInput" type="search" placeholder="标题 / key / 状态 / 主题" />
+          </label>
+
+          <nav class="item-list" id="itemList" aria-label="项目列表"></nav>
+        </div>
+
+        <section class="sidebar-workflow" aria-label="全局工作流">
+          <button class="daily-workflow-button" id="dailyWorkflowButton">
+            <span>开始今天的论文速读</span>
+            <small>从 Zotero 待读列表生成今日总结和精读候选</small>
+          </button>
+          <div class="daily-run-status" id="dailyRunStatus" aria-live="polite"></div>
+        </section>
+      </aside>
+
+      <main class="workspace">
+        <section class="detail-header" id="detailHeader"></section>
+
+        <div class="view-tabs" id="viewTabs" role="tablist" aria-label="详情视图">
+          <button class="view-tab is-active" data-view="overview">概览</button>
+          <button class="view-tab" data-view="quick">快读</button>
+          <button class="view-tab" data-view="deep">精读</button>
+          <button class="view-tab" data-view="map">思路图</button>
+          <button class="view-tab" data-view="interact">共读交互</button>
+        </div>
+
+        <section class="content-panel" id="contentPanel" aria-live="polite"></section>
+      </main>
+    </div>
+
+    <template id="emptyStateTemplate">
+      <div class="empty-state">
+        <h2>还没有可展示的内容</h2>
+        <p>生成 state/reading_queue.json、outputs/papers 或 outputs/themes 后，这里会自动汇总。</p>
+      </div>
+    </template>
+
+    <script type="module" src="/js/app.js?v=20260617-workflow-bridge"></script>
+  </body>
+</html>

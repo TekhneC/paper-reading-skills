@@ -1,0 +1,7 @@
+interface:
+  display_name: "Deep Read Interaction"
+  short_description: "Clarify, verify, and refine existing deep reads"
+  default_prompt: "Use $deep-read-interaction to verify my understanding against the deep-read report and source evidence."
+
+policy:
+  allow_implicit_invocation: true

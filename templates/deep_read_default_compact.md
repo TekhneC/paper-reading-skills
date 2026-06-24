@@ -45,12 +45,13 @@
 Embed the most important figure when available, preferably a model architecture, process diagram, workflow, scope diagram, or taxonomy overview.
 
 ```markdown
-![Key figure: <short description>](<relative path to extracted figure image>)
+![Key figure: <short description>](<absolute local path to extracted figure image>)
 ```
 
 Figure source:
 
 * Figure / page:
+* Markdown image path policy: use absolute local `crop_image_path` or `image_path`, wrapped in angle brackets; use repo-relative paths only when portable Markdown is explicitly requested.
 * Why this is the key visual anchor:
 * What it clarifies for the reader:
 * Extraction reliability: rendered page / extracted image / caption-only / needs visual verification

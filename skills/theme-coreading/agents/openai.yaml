@@ -1,0 +1,7 @@
+interface:
+  display_name: "Theme Co-reading"
+  short_description: "Compare paper clusters and maintain synthesis state"
+  default_prompt: "Use $theme-coreading to compare these papers around my research question and update the theme synthesis."
+
+policy:
+  allow_implicit_invocation: true
