@@ -857,7 +857,14 @@ pre code {
 }
 
 .source-collapsed .editor-pane > .pane-toolbar {
-  padding-right: 120px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  padding-right: 300px;
+}
+
+.source-collapsed .editor-pane > .pane-toolbar .toolbar-actions {
+  max-width: 100%;
+  flex-wrap: wrap;
 }
 
 .source-collapsed .source-pane {
@@ -871,7 +878,13 @@ pre code {
 }
 
 .source-collapsed .source-pane .pane-toolbar {
-  display: block;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.source-collapsed .source-pane .toolbar-actions {
+  flex-wrap: nowrap;
 }
 
 .source-collapsed .source-pane h3,
@@ -888,6 +901,7 @@ pre code {
   display: grid !important;
 }
 
+.source-collapsed #toggleDeepInteractionButton,
 .source-collapsed #toggleSourcePaneButton {
   white-space: nowrap;
   border-color: #b8c8d7;
@@ -1520,6 +1534,43 @@ pre code {
   z-index: 10;
 }
 
+@media (min-width: 1100px) {
+  .content-panel {
+    padding: 28px 32px;
+  }
+
+  .overview-stack,
+  .todo-layout,
+  .chat-panel {
+    max-width: min(1440px, 100%);
+  }
+
+  .content-panel > .markdown,
+  .todo-layout .markdown,
+  .rendered-markdown-editor .markdown,
+  .markdown-preview .markdown {
+    max-width: min(1360px, 100%);
+  }
+
+  .split-reader.source-collapsed {
+    --reader-body-height: clamp(680px, calc(100vh - 180px), 1120px);
+  }
+
+  .source-collapsed .rendered-markdown-editor .markdown {
+    max-width: min(1520px, 100%);
+  }
+}
+
+@media (min-width: 1100px) {
+  .source-collapsed .editor-pane > .pane-toolbar {
+    padding-right: 340px;
+  }
+
+  .source-collapsed .rendered-markdown-editor,
+  .source-collapsed .markdown-source-editor {
+    padding-inline: 24px;
+  }
+}
 @media (max-width: 1100px) {
   .split-reader {
     grid-template-columns: 1fr;

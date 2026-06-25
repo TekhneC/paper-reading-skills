@@ -11,7 +11,7 @@
 
 1. 工作流优化
 2. 本地 site 开发
-3. 治理层设计
+3. 治理层维护与设计收敛
 
 ## Current Consensus Snapshot
 
@@ -24,11 +24,13 @@
 
 ## Current P0 Priorities
 
-1. 在 `/governance` 下新增治理层。
-2. 将 `site/DESIGN_DECISIONS.md` 停用为主设计决策容器。
-3. 澄清主阅读工作流和 site-mediated workflow。
-4. 将 collection builder 和 add-paper-during-coreading 定义为 exploration。
-5. 准备 workflow state validator exploration。
+1. 设计并实现 workflow state validator。
+2. 收敛 co-reading collection builder 的最小设计。
+3. 收敛 add-paper-during-coreading 的工作流规则。
+
+## Current Baseline
+
+Governance layer bootstrap 已基本完备：`governance/` 已记录项目共识、决策索引、accepted decisions、open explorations、workflow 边界与开发优先级。后续治理工作以维护、漂移检查和设计收敛为主。
 
 ## Read Next
 

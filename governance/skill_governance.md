@@ -20,6 +20,7 @@ Skill governance 是轻量的、interface-oriented 的治理。
 - `single-paper-deep-read`
 - `deep-read-interaction`
 - `theme-coreading`
+- `project-governance-maintainer`
 
 ## Site-triggered Skills
 
@@ -65,3 +66,16 @@ Expected behavior:
 - 回答 theme-level co-reading questions；
 - 使用 theme state 作为上下文；
 - 帮助用户手动更新 matrix 或 synthesis。
+
+## Developer-triggered Skills
+
+### project-governance-maintainer
+
+由 Codex 在用户询问项目状态、治理共识、设计决策、开放探索、开发优先级、治理漂移，或要求更新 `governance/` 时触发。
+
+Expected behavior:
+
+- 维护轻量 governance layer；
+- 判断请求属于 ordinary TODO、Exploration、Decision、priority update 或 drift；
+- 不复制 `AGENTS.md` 或其他 `SKILL.md` 的完整流程；
+- 不作为普通 site-triggered reading workflow 暴露。
