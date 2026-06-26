@@ -1,6 +1,6 @@
 ﻿---
 name: project-governance-maintainer
-description: Use this skill to orient, triage, and maintain a project's repository governance layer. Trigger when the user asks about current project state, stable consensus, accepted decisions, open explorations, development priorities, governance drift, whether a request should become a Decision or Exploration, or wants to update governance records. Do not use it for domain work, feature implementation, or generated outputs unless governance state is the main task.
+description: Use this skill to orient, triage, and maintain a project's repository governance layer and current-state summary. Trigger when the user asks about current project state, stable consensus, accepted decisions, open explorations, development priorities, governance drift, whether a request should become a Decision or Exploration, wants to update governance records, or needs PROJECT_STATE.md/current-state files kept in sync. Do not use it for domain work, feature implementation, or generated outputs unless governance state is the main task.
 ---
 
 # Project Governance Maintainer
@@ -98,6 +98,23 @@ When creating or updating a Decision, include:
 - implementation impact.
 
 After a Decision, update only affected indexes, consensus files, workflow files, component governance files, or priority files. Keep governance concise and avoid copying full procedures from instruction files, skill files, implementation docs, or external specifications.
+
+## Project State Maintenance
+
+When the project has a current-state file, usually `PROJECT_STATE.md`, treat it as a compact current-state index rather than the full governance source of truth.
+
+After any governance update, priority update, accepted Decision, newly opened or closed Exploration, drift finding, or user instruction that changes current project status, check whether the current-state file must be updated in the same turn.
+
+Update the current-state file when any of these change:
+
+- current phase or stage;
+- current P0/P1/P2 priorities, if the project tracks them there;
+- active Explorations or their status;
+- project-specific operating context needed by generic skills;
+- source map or required reading order;
+- accepted Decision snapshot, if the project keeps one there.
+
+Keep the current-state file concise. Prefer pointers to governance records over copied details. Do not write project facts into this skill; write them into the project's current-state and governance files.
 
 ## Priority Rules
 
