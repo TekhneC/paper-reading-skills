@@ -2,7 +2,7 @@
 
 Daily run directory: `outputs/daily/{{date}}/`
 
-## 1. 今日阅读概览
+## 今日阅读概览
 
 - Queue source:
 - Queue size:
@@ -10,13 +10,13 @@ Daily run directory: `outputs/daily/{{date}}/`
 - Needs quick read:
 - Recommended deep-reading candidates:
 
-## 2. 今日论文分诊表
+## 今日论文分诊表
 
 | Paper key | Title | Quick-read status | Recommended action | Evidence | Uncertainty |
 | --- | --- | --- | --- | --- | --- |
 |  |  |  |  |  |  |
 
-## 3. 单篇快读摘要
+## 单篇快读摘要
 
 ### <paper_key> - <title>
 
@@ -25,13 +25,13 @@ Daily run directory: `outputs/daily/{{date}}/`
 - Evidence source:
 - Evidence location:
 
-## 4. 推荐精读候选
+## 推荐精读候选
 
 | Rank | Paper key | Title | Decision label | Suggested deep-read focus | Risk or uncertainty |
 | --- | --- | --- | --- | --- | --- |
 |  |  |  |  |  |  |
 
-## 5. 推荐理由矩阵
+## 推荐理由矩阵
 
 Use qualitative ratings: `high`, `medium`, `low`, or `unknown`.
 
@@ -51,13 +51,13 @@ Use qualitative ratings: `high`, `medium`, `low`, or `unknown`.
 - Evidence location:
 - Remaining uncertainty:
 
-## 6. 需要确认的事项
+## 需要确认的事项
 
 - [ ] Confirm which papers should enter formal deep reading.
 - [ ] Confirm whether papers with completed quick-read outputs should be recorded in `state/processed_papers.json`.
 - [ ] Confirm whether Zotero tags should be cleaned up manually after reading.
 
-## 7. 建议状态更新
+## 建议状态更新
 
 ```text
 queued -> quick_read_done

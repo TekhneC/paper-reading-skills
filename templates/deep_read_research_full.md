@@ -28,7 +28,7 @@
 
 ---
 
-## 1. 核心结论与阅读定位（executive takeaway）
+## 核心结论与阅读定位
 
 用 3-5 句话说明这篇论文最值得记住的抓手。
 
@@ -66,9 +66,9 @@ Figure source:
 
 ---
 
-## 2. 问题、动机与核心思路（problem, motivation, and central idea）
+## 问题、动机与核心思路
 
-### 2.1 作者明确声称的问题
+### 作者明确声称的问题
 
 说明作者如何定义问题，以及为什么认为该问题重要。
 
@@ -76,7 +76,7 @@ Figure source:
 
 * （文件名：xxx.pdf，第 x 页）
 
-### 2.2 既有工作的不足
+### 既有工作的不足
 
 说明论文认为此前方法、系统、数据、任务设定或评价方式有什么不足。
 
@@ -84,7 +84,7 @@ Figure source:
 
 * （文件名：xxx.pdf，第 x 页）
 
-### 2.3 核心思路与关键假设
+### 核心思路与关键假设
 
 说明论文的 central insight、关键差异、依赖假设和预期优势。
 
@@ -93,7 +93,7 @@ Figure source:
 * Key assumptions:
 * Why it should work:
 
-### 2.4 证据支持度与问题成立性判断
+### 证据支持度与问题成立性判断
 
 区分：
 
@@ -103,11 +103,11 @@ Figure source:
 
 ---
 
-## 3. 评价标尺与证据设计（evaluation metrics and evidence design）
+## 评价标尺与证据设计
 
 > Metrics-first：先理解论文如何定义“好”、如何评价、优化目标是什么，再进入方法机制。
 
-### 3.1 评价目标
+### 评价目标
 
 说明论文希望评价什么能力或效果。
 
@@ -123,13 +123,13 @@ Figure source:
 * interpretability
 * ecological validity
 
-### 3.2 数据集、benchmark 与指标
+### 数据集、benchmark 与指标
 
 | Dataset / Benchmark | Metric | What it measures | Relation to claim | Limitation |
 | ------------------- | ------ | ---------------- | ----------------- | ---------- |
 |                     |        |                  |                   |            |
 
-### 3.3 人工评价、用户研究或定性评价
+### 人工评价、用户研究或定性评价
 
 如适用，说明：
 
@@ -145,7 +145,7 @@ Figure source:
 
 * （文件名：xxx.pdf，第 x 页）
 
-### 3.4 指标与研究目标的匹配度
+### 指标与研究目标的匹配度
 
 重点判断：
 
@@ -161,13 +161,13 @@ Figure source:
 
 ---
 
-## 4. 方法机制与实验结果（method, mechanism, and results）
+## 方法机制与实验结果
 
-### 4.1 方法总览
+### 方法总览
 
 用一段话解释整体 pipeline。
 
-### 4.2 输入、输出与中间表示
+### 输入、输出与中间表示
 
 * Input:
 * Output:
@@ -175,13 +175,13 @@ Figure source:
 * Intermediate representation:
 * Assumptions:
 
-### 4.3 核心模块或机制
+### 核心模块或机制
 
 | Component | Function | Evidence |
 | --------- | -------- | -------- |
 |           |          | （文件名：xxx.pdf，第 x 页） |
 
-### 4.4 训练目标、优化方式或系统流程
+### 训练目标、优化方式或系统流程
 
 如适用，说明：
 
@@ -192,7 +192,7 @@ Figure source:
 * System workflow:
 * Implementation assumptions:
 
-### 4.5 实验设置
+### 实验设置
 
 * Dataset / material:
 * Task:
@@ -206,7 +206,7 @@ Figure source:
 
 * （文件名：xxx.pdf，第 x 页）
 
-### 4.6 主要结果、消融与失败案例
+### 主要结果、消融与失败案例
 
 | Result / Ablation / Case | Evidence | What it supports | What it does not prove |
 | ------------------------ | -------- | ---------------- | ---------------------- |
@@ -214,9 +214,9 @@ Figure source:
 
 ---
 
-## 5. Claim-evidence 对齐与局限（alignment, discussion, and limitations）
+## Claim-evidence 对齐与局限
 
-### 5.1 Claim-evidence 检查
+### Claim-evidence 检查
 
 | Claim | Evidence | Evidence strength | What it supports | What it does not prove |
 | ----- | -------- | ----------------- | ---------------- | ---------------------- |
@@ -232,7 +232,7 @@ Figure source:
 6. 定性展示是否被当成强证据；
 7. 是否存在 overclaiming。
 
-### 5.2 作者承认的局限
+### 作者承认的局限
 
 *
 
@@ -240,7 +240,7 @@ Figure source:
 
 * （文件名：xxx.pdf，第 x 页）
 
-### 5.3 证据缺口与迁移风险判断
+### 证据缺口与迁移风险判断
 
 从以下角度检查：
 
@@ -256,21 +256,21 @@ Figure source:
 * failure cases
 * ethical concerns
 
-### 5.4 对后续工作的影响
+### 对后续工作的影响
 
 尤其针对 classic_paper，说明这些局限如何被后续工作继承、修正或绕开。
 
 ---
 
-## 6. 谱系、团队线索与外部验证（lineage, team signals, and verification）
+## 谱系、团队线索与外部验证
 
-### 6.1 论文中明确引用的前序工作
+### 论文中明确引用的前序工作
 
 | Work | Year | Relation to this paper | Evidence |
 | ---- | ---: | ---------------------- | -------- |
 |      |      |                        | （文件名：xxx.pdf，第 x 页） |
 
-### 6.2 按研究子类型调整追踪重点
+### 按研究子类型调整追踪重点
 
 * classic_paper：prior work、same-team prior work、follow-up work、same-team follow-up work、representative citing works。
 * new_paper：prior work、same-team prior work、baseline works、closely related concurrent work。
@@ -280,7 +280,7 @@ Figure source:
 | ---- | ---: | -------- | --------------- | ---------- |
 |      |      |          |                 | confirmed / likely / candidate / unverified |
 
-### 6.3 轻量团队研究线索
+### 轻量团队研究线索
 
 * First author:
 * Corresponding author:
@@ -291,31 +291,31 @@ Figure source:
 * ORCID / Semantic Scholar authorId / OpenAlex author ID:
 * Evidence:
 
-### 6.4 需要外部确认的线索
+### 需要外部确认的线索
 
 *
 
 ---
 
-## 7. 对用户研究的借鉴与后续方向（transferable insights and follow-up directions）
+## 对用户研究的借鉴与后续方向
 
-### 7.1 可以借鉴什么
-
-*
-
-### 7.2 不能直接照搬什么
+### 可以借鉴什么
 
 *
 
-### 7.3 可转化为综述比较维度的内容
+### 不能直接照搬什么
 
 *
 
-### 7.4 可转化为实验、评价或系统设计的内容
+### 可转化为综述比较维度的内容
 
 *
 
-### 7.5 审稿人视角的潜在追问
+### 可转化为实验、评价或系统设计的内容
+
+*
+
+### 审稿人视角的潜在追问
 
 根据 research_subtype 调整严格度：
 
@@ -329,7 +329,7 @@ Figure source:
 2.
 3.
 
-### 7.6 同行研究者视角的后续方向
+### 同行研究者视角的后续方向
 
 | Direction | Responds to which limitation | How to extend this paper | Needed data / method / evaluation |
 | --------- | ---------------------------- | ------------------------ | --------------------------------- |
@@ -337,15 +337,15 @@ Figure source:
 
 ---
 
-## 8. 英文写作与 oral 可用素材（English-ready takeaways）
+## 英文写作与 oral 可用素材
 
-### 8.1 Key terms
+### Key terms
 
 | 中文术语 | English term |
 | -------- | ------------ |
 |          |              |
 
-### 8.2 Possible English phrasing
+### Possible English phrasing
 
 * This paper addresses ...
 * The key idea is ...
@@ -353,13 +353,13 @@ Figure source:
 * The evidence supports ..., but does not prove ...
 * This work is useful for my project because ...
 
-### 8.3 One-slide takeaway
+### One-slide takeaway
 
 *
 *
 *
 
-### 8.4 Oral explanation
+### Oral explanation
 
 用自然英文写一段 30-60 秒 oral 说明：
 

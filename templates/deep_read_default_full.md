@@ -27,9 +27,9 @@
 
 ---
 
-## 1. 类型判定与核心结论（type decision and executive takeaway）
+## 类型判定与核心结论
 
-### 1.1 类型判定说明
+### 类型判定说明
 
 说明为什么无法明确归类为 `research_article` 或 `survey_article`。
 
@@ -45,7 +45,7 @@
 
 *
 
-### 1.2 核心结论先行
+### 核心结论先行
 
 用 3-5 句话写出这篇论文的记忆抓手。
 
@@ -77,7 +77,7 @@ Figure source:
 
 ---
 
-## 2. 问题、范围与组织角度（problem, scope, and organizing perspective）
+## 问题、范围与组织角度
 
 根据论文实际类型选择说明：
 
@@ -101,7 +101,7 @@ Figure source:
 
 ---
 
-## 3. 评价、证据或分类标尺（evaluation, evidence, or classification standard）
+## 评价、证据或分类标尺
 
 说明论文如何建立判断标准。
 
@@ -122,21 +122,21 @@ Figure source:
 
 ---
 
-## 4. 核心内容、方法或论证结构（method, content, or argument structure）
+## 核心内容、方法或论证结构
 
 根据论文实际内容展开。
 
-### 4.1 主体结构
+### 主体结构
 
 *
 
-### 4.2 核心组件、概念或分类
+### 核心组件、概念或分类
 
 | Element | Role | Evidence |
 | ------- | ---- | -------- |
 |         |      | （文件名：xxx.pdf，第 x 页） |
 
-### 4.3 主要结果、发现或论点
+### 主要结果、发现或论点
 
 | Result / finding / argument | Evidence | What it supports | What it does not prove |
 | --------------------------- | -------- | ---------------- | ---------------------- |
@@ -144,63 +144,63 @@ Figure source:
 
 ---
 
-## 5. Alignment 检查与局限（alignment and limitations）
+## Alignment 检查与局限
 
 根据最接近的论文类型选择检查方式。
 
-### 5.1 Claim-evidence / scope-taxonomy / argument-evidence 检查
+### Claim-evidence / scope-taxonomy / argument-evidence 检查
 
 | Claim / scope / argument | Evidence | Strength | Gap or uncertainty |
 | ------------------------ | -------- | -------- | ------------------ |
 |                          | （文件名：xxx.pdf，第 x 页） | strong / moderate / weak / unclear |                    |
 
-### 5.2 作者承认的局限
+### 作者承认的局限
 
 *
 
-### 5.3 证据缺口与迁移风险判断
+### 证据缺口与迁移风险判断
 
 *
 
 ---
 
-## 6. 相关工作、作者线索与外部验证（related work, author signals, and verification）
+## 相关工作、作者线索与外部验证
 
-### 6.1 相关工作与谱系位置
+### 相关工作与谱系位置
 
 | Work | Year | Relation | Evidence |
 | ---- | ---: | -------- | -------- |
 |      |      |          | （文件名：xxx.pdf，第 x 页） |
 
-### 6.2 团队或作者线索
+### 团队或作者线索
 
 *
 
-### 6.3 需要外部确认的事项
+### 需要外部确认的事项
 
 *
 
 ---
 
-## 7. 对用户研究的借鉴与后续方向（transferable insights and follow-up directions）
+## 对用户研究的借鉴与后续方向
 
-### 7.1 可以借鉴什么
-
-*
-
-### 7.2 不能直接照搬什么
+### 可以借鉴什么
 
 *
 
-### 7.3 可转化为综述比较维度的内容
+### 不能直接照搬什么
 
 *
 
-### 7.4 可转化为实验、评价、系统设计或理论框架的内容
+### 可转化为综述比较维度的内容
 
 *
 
-### 7.5 审稿人或同行研究者可能追问的问题
+### 可转化为实验、评价、系统设计或理论框架的内容
+
+*
+
+### 审稿人或同行研究者可能追问的问题
 
 1.
 2.
@@ -208,15 +208,15 @@ Figure source:
 
 ---
 
-## 8. 英文写作与 oral 可用素材（English-ready takeaways）
+## 英文写作与 oral 可用素材
 
-### 8.1 Key terms
+### Key terms
 
 | 中文术语 | English term |
 | -------- | ------------ |
 |          |              |
 
-### 8.2 Possible English phrasing
+### Possible English phrasing
 
 * This paper defines ...
 * The central argument is ...
@@ -224,13 +224,13 @@ Figure source:
 * The evidence supports ..., but leaves open ...
 * This work is useful for my project because ...
 
-### 8.3 One-slide takeaway
+### One-slide takeaway
 
 *
 *
 *
 
-### 8.4 Oral explanation
+### Oral explanation
 
 用自然英文写一段 30-60 秒 oral 说明：
 

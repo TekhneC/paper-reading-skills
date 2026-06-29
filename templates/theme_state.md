@@ -19,17 +19,17 @@
 
 ---
 
-## 1. 当前主题定义（current theme definition）
+## 当前主题定义
 
-### 1.1 Core theme
-
-*
-
-### 1.2 User-confirmed research question
+### Core theme
 
 *
 
-### 1.3 Provisional research question candidates
+### User-confirmed research question
+
+*
+
+### Provisional research question candidates
 
 > Only use this section when the research question is not confirmed.
 
@@ -37,33 +37,33 @@
 2.
 3.
 
-### 1.4 Research question status note
+### Research question status note
 
 *
 
 ---
 
-## 2. 论文集合边界（paper set boundary）
+## 论文集合边界
 
-### 2.1 Included papers
+### Included papers
 
 | Paper | Year | Source | Current role | Evidence status                                                |
 | ----- | ---: | ------ | ------------ | -------------------------------------------------------------- |
 |       |      |        |              | deep_read / quick_read / metadata_only / missing_pdf / unknown |
 
-### 2.2 Excluded or deferred papers
+### Excluded or deferred papers
 
 | Paper | Reason | Status                         |
 | ----- | ------ | ------------------------------ |
 |       |        | exclude / defer / verify_later |
 
-### 2.3 Missing or suspected missing papers
+### Missing or suspected missing papers
 
 | Missing item | Why it may be needed | How to verify |
 | ------------ | -------------------- | ------------- |
 |              |                      |               |
 
-### 2.4 Sufficiency judgment
+### Sufficiency judgment
 
 当前论文集合是否足以支撑研究问题：
 
@@ -71,7 +71,7 @@
 
 ---
 
-## 3. 论文角色标注（paper roles）
+## 论文角色标注
 
 | Paper | Role                                                                                                                                                                                                                                 | Why this role | Relation to research question | Evidence status | Needed next step                                                                                             |
 | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------- | ----------------------------- | --------------- | ------------------------------------------------------------------------------------------------------------ |
@@ -79,15 +79,15 @@
 
 ---
 
-## 4. 比较维度（comparison dimensions）
+## 比较维度
 
-### 4.1 Active dimensions
+### Active dimensions
 
 | Dimension | Why it matters | Applies to which papers | Evidence status |
 | --------- | -------------- | ----------------------- | --------------- |
 |           |                |                         |                 |
 
-### 4.2 Rejected or postponed dimensions
+### Rejected or postponed dimensions
 
 | Dimension | Reason |
 | --------- | ------ |
@@ -95,53 +95,53 @@
 
 ---
 
-## 5. 用户交互重点与决策记录（user interaction focus and decision log）
+## 用户交互重点与决策记录
 
 | Interaction focus | User decision / preference | Impact on synthesis |
 | ----------------- | -------------------------- | ------------------- |
 |                   |                            |                     |
 
-### 5.1 User-emphasized issues
+### User-emphasized issues
 
 *
 
-### 5.2 User-rejected interpretations
+### User-rejected interpretations
 
 *
 
-### 5.3 Open questions from interaction
+### Open questions from interaction
 
 *
 
 ---
 
-## 6. 领域研究谱系追踪（field lineage tracing）
+## 领域研究谱系追踪
 
-### 6.1 Tracing status
+### Tracing status
 
 * Field lineage status: not_started / local_only / external_search_needed / partially_verified / sufficiently_verified
 * Evidence basis:
 * Main uncertainty:
 
-### 6.2 Prior works
+### Prior works
 
 | Work | Year | Relation to current set                                           | Evidence source | Confidence                                  |
 | ---- | ---: | ----------------------------------------------------------------- | --------------- | ------------------------------------------- |
 |      |      | prior / baseline / shared_reference / task_origin / method_origin |                 | confirmed / likely / candidate / unverified |
 
-### 6.3 Baseline works
+### Baseline works
 
 | Work | Year | Used by which papers | Why important | Confidence                                  |
 | ---- | ---: | -------------------- | ------------- | ------------------------------------------- |
 |      |      |                      |               | confirmed / likely / candidate / unverified |
 
-### 6.4 Surveys, taxonomies, or framework papers
+### Surveys, taxonomies, or framework papers
 
 | Work | Year | Scope / framework | Relation to current theme | Confidence                                  |
 | ---- | ---: | ----------------- | ------------------------- | ------------------------------------------- |
 |      |      |                   |                           | confirmed / likely / candidate / unverified |
 
-### 6.5 Follow-up or adjacent works
+### Follow-up or adjacent works
 
 | Work | Year | Relation                                                         | Why it matters | Confidence                                  |
 | ---- | ---: | ---------------------------------------------------------------- | -------------- | ------------------------------------------- |
@@ -149,7 +149,7 @@
 
 ---
 
-## 7. 补充阅读推荐（supplementary reading recommendations）
+## 补充阅读推荐
 
 | Candidate paper | Year | Why recommended | Relation to current set | Suggested action                                                             | Confidence                                  |
 | --------------- | ---: | --------------- | ----------------------- | ---------------------------------------------------------------------------- | ------------------------------------------- |
@@ -157,15 +157,15 @@
 
 ---
 
-## 8. Quick / Deep Read handoff 计划（reading handoff plan）
+## Quick / Deep Read handoff 计划
 
-### 8.1 Quick read handoffs
+### Quick read handoffs
 
 | Paper | Reason for quick read | Expected decision                       | Priority            |
 | ----- | --------------------- | --------------------------------------- | ------------------- |
 |       |                       | include / exclude / deep_read_candidate | high / medium / low |
 
-### 8.2 Deep read handoffs
+### Deep read handoffs
 
 | Paper | Reason for deep read | Suggested report mode        | Expected contribution to co-reading | Priority            |
 | ----- | -------------------- | ---------------------------- | ----------------------------------- | ------------------- |
@@ -173,7 +173,7 @@
 
 ---
 
-## 9. 证据状态（evidence status）
+## 证据状态
 
 | Evidence source          | Papers / claims supported | Confidence          | Limitation |
 | ------------------------ | ------------------------- | ------------------- | ---------- |
@@ -185,25 +185,25 @@
 
 ---
 
-## 10. 共读关键共识与后续决策（co-reading consensus and next actions）
+## 共读关键共识与后续决策
 
-### 10.1 Confirmed conclusions
-
-*
-
-### 10.2 Confirmed user preferences
+### Confirmed conclusions
 
 *
 
-### 10.3 Unresolved questions
+### Confirmed user preferences
 
 *
 
-### 10.4 Hypotheses needing verification
+### Unresolved questions
 
 *
 
-### 10.5 Next actions
+### Hypotheses needing verification
+
+*
+
+### Next actions
 
 1.
 2.

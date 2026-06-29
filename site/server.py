@@ -151,6 +151,7 @@ CODEX_EXEC_ARGS = CODEX_CONFIG.get("exec_args", ["exec"])
 CODEX_TIMEOUT_SECONDS = int(CODEX_CONFIG.get("timeout_seconds", 600))
 RUN_CODEX_DAILY_DEFAULT = bool(CODEX_CONFIG.get("run_daily_from_site", True))
 DAILY_FALLBACK_ON_CODEX_FAILURE_DEFAULT = bool(CODEX_CONFIG.get("daily_fallback_on_codex_failure", False))
+DAILY_OUTPUT_QUESTION_RUN_THRESHOLD = 6
 RUNTIME_CONFIG = CONFIG.get("runtime", {}) if isinstance(CONFIG.get("runtime", {}), dict) else {}
 PYTHON_COMMAND = (
     os.environ.get("PAPER_READING_PYTHON_COMMAND")
@@ -396,6 +397,14 @@ def run_external_codex(prompt: str) -> dict[str, Any]:
     output_dir.mkdir(parents=True, exist_ok=True)
     output_path = output_dir / f"codex_reply_{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S%f')}_{os.getpid()}.md"
     command = command_base + codex_exec_args() + ["--output-last-message", str(output_path), "-"]
+    env = os.environ.copy()
+    env.update(
+        {
+            "PYTHONIOENCODING": "utf-8",
+            "PYTHONUTF8": "1",
+            "LC_ALL": env.get("LC_ALL") or "C.UTF-8",
+        }
+    )
     try:
         result = subprocess.run(
             command,
@@ -406,6 +415,7 @@ def run_external_codex(prompt: str) -> dict[str, Any]:
             encoding="utf-8",
             errors="replace",
             timeout=CODEX_TIMEOUT_SECONDS,
+            env=env,
         )
     except FileNotFoundError:
         return {
@@ -711,6 +721,10 @@ Required behavior:
   `outputs/daily/{day}/digest.md`
   `outputs/daily/{day}/quick_reads.json`
   `outputs/daily/{day}/deep_read_candidates.json`
+- Write all Markdown and JSON files as UTF-8 explicitly. If you use PowerShell,
+  set `[Console]::InputEncoding`, `[Console]::OutputEncoding`, and
+  `$OutputEncoding` to UTF-8 before any command that carries Chinese text; do
+  not pipe Chinese text through an ASCII/default-ANSI text channel.
 - Use the schemas from `skills/daily-paper-triage/references/schema.md`.
 - Do not mark any paper as `deep_read_approved` or `deep_read_done`.
 - Do not downgrade any existing state. A paper that already has approval or a
@@ -970,6 +984,217 @@ def read_daily_run_status() -> dict[str, Any] | None:
     return status
 
 
+
+def daily_required_output_paths(day: str) -> list[Path]:
+    return [
+        DAILY_DIR / day / "digest.md",
+        DAILY_DIR / day / "quick_reads.json",
+        DAILY_DIR / day / "deep_read_candidates.json",
+    ]
+
+
+def max_question_run(text: str) -> int:
+    return max((len(match.group(0)) for match in re.finditer(r"\?+", text)), default=0)
+
+
+def daily_output_snapshot(day: str) -> dict[str, Any]:
+    files: list[dict[str, Any]] = []
+    for path in daily_required_output_paths(day):
+        record: dict[str, Any] = {"path": rel(path), "exists": path.exists()}
+        if path.exists():
+            stat = path.stat()
+            record.update(
+                {
+                    "bytes": stat.st_size,
+                    "mtime_ns": stat.st_mtime_ns,
+                    "mtime": datetime.fromtimestamp(stat.st_mtime, timezone.utc).isoformat(),
+                }
+            )
+        files.append(record)
+    return {"files": files}
+
+
+def validate_daily_output_freshness(day: str, snapshot: dict[str, Any] | None) -> dict[str, Any]:
+    if not snapshot:
+        return {"ok": True, "issues": [], "files": []}
+    before = {item.get("path"): item for item in snapshot.get("files", []) if isinstance(item, dict)}
+    issues: list[str] = []
+    files: list[dict[str, Any]] = []
+    for path in daily_required_output_paths(day):
+        path_key = rel(path)
+        previous = before.get(path_key, {})
+        record: dict[str, Any] = {"path": path_key, "exists": path.exists()}
+        if not path.exists():
+            issues.append(f"Daily output was not produced for this run: {path_key}")
+            files.append(record)
+            continue
+        stat = path.stat()
+        record.update(
+            {
+                "bytes": stat.st_size,
+                "mtime_ns": stat.st_mtime_ns,
+                "mtime": datetime.fromtimestamp(stat.st_mtime, timezone.utc).isoformat(),
+                "previous_mtime_ns": previous.get("mtime_ns"),
+            }
+        )
+        if previous.get("exists") and stat.st_mtime_ns <= int(previous.get("mtime_ns") or 0):
+            issues.append(f"Daily output is stale for this run: {path_key}")
+        files.append(record)
+    return {"ok": not issues, "issues": issues, "files": files}
+
+
+def validate_daily_outputs(day: str, output_snapshot: dict[str, Any] | None = None) -> dict[str, Any]:
+    issues: list[str] = []
+    files: list[dict[str, Any]] = []
+    freshness = validate_daily_output_freshness(day, output_snapshot)
+    issues.extend(freshness["issues"])
+    for path in daily_required_output_paths(day):
+        record: dict[str, Any] = {"path": rel(path), "exists": path.exists()}
+        if not path.exists():
+            issues.append(f"Missing required Daily output: {rel(path)}")
+            files.append(record)
+            continue
+        try:
+            content = path.read_text(encoding="utf-8")
+        except UnicodeDecodeError as exc:
+            issues.append(f"Daily output is not valid UTF-8: {rel(path)} ({exc})")
+            files.append(record)
+            continue
+        question_run = max_question_run(content)
+        record.update(
+            {
+                "bytes": path.stat().st_size,
+                "question_marks": content.count("?"),
+                "max_question_run": question_run,
+            }
+        )
+        if question_run >= DAILY_OUTPUT_QUESTION_RUN_THRESHOLD:
+            issues.append(
+                f"Suspicious replacement-question run in {rel(path)}: {question_run} consecutive '?' characters"
+            )
+        if path.suffix.lower() == ".json":
+            try:
+                json.loads(content)
+            except json.JSONDecodeError as exc:
+                issues.append(f"Daily JSON output is invalid: {rel(path)} ({exc})")
+        files.append(record)
+    return {"ok": not issues, "issues": issues, "files": files, "freshness": freshness}
+
+
+def parse_status_time(value: Any) -> datetime | None:
+    if not isinstance(value, str) or not value:
+        return None
+    try:
+        return datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+
+
+def reconcile_daily_run_status() -> dict[str, Any] | None:
+    status = read_daily_run_status()
+    if not status or status.get("status") != "running":
+        return status
+    day = str(status.get("date") or "")
+    run_id = str(status.get("run_id") or "")
+    if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", day):
+        return status
+
+    forced_rerun = bool(status.get("force"))
+    output_snapshot = status.get("output_snapshot") if forced_rerun else None
+    has_snapshot = isinstance(output_snapshot, dict)
+    validation = validate_daily_outputs(day, output_snapshot if has_snapshot else None)
+    freshness = validation.get("freshness") if isinstance(validation.get("freshness"), dict) else {"ok": True}
+    required_exist = all(Path(REPO_ROOT / item["path"]).exists() for item in validation.get("files", []))
+    now = datetime.now(timezone.utc)
+    updated_at = parse_status_time(status.get("updated_at") or status.get("started_at"))
+    stale = bool(updated_at and (now - updated_at).total_seconds() > CODEX_TIMEOUT_SECONDS)
+
+    if required_exist:
+        if forced_rerun:
+            if not stale:
+                return status
+            if not has_snapshot:
+                validation.setdefault("issues", []).append("Cannot reconcile forced Daily rerun without an output snapshot.")
+            elif not freshness.get("ok"):
+                validation.setdefault("issues", []).append("Forced Daily rerun became stale before fresh outputs were observed.")
+            message = "BUG: Forced Daily rerun is stale before external Codex completion."
+            write_daily_run_status(
+                {
+                    "run_id": run_id,
+                    "date": day,
+                    "status": "bug",
+                    "step": "codex_status_bug",
+                    "message": message,
+                    "archive_path": rel(DAILY_DIR / day),
+                    "generated_by": "external_codex:daily-paper-triage",
+                    "codex_status": status.get("codex_status") or "forced_rerun_stale",
+                    "codex_output_validation": validation,
+                    "completed_at": utc_now(),
+                }
+            )
+            append_daily_run_log(run_id, "codex_status_bug", message, validation=validation)
+            append_event("daily_codex_status_bug", {"date": day, "path": rel(DAILY_DIR / day), "validation": validation})
+            return read_daily_run_status()
+        if not freshness.get("ok") and not stale:
+            return status
+        if validation["ok"]:
+            message = "Recovered missing external Codex completion record after dashboard refresh."
+            write_daily_run_status(
+                {
+                    "run_id": run_id,
+                    "date": day,
+                    "status": "completed",
+                    "step": "codex_completion_reconciled",
+                    "message": message,
+                    "archive_path": rel(DAILY_DIR / day),
+                    "generated_by": "external_codex:daily-paper-triage",
+                    "codex_status": status.get("codex_status") or "unknown_reconciled",
+                    "codex_output_validation": validation,
+                    "completed_at": utc_now(),
+                }
+            )
+            append_daily_run_log(run_id, "codex_completion_reconciled", message, validation=validation)
+            append_event("daily_codex_completion_reconciled", {"date": day, "path": rel(DAILY_DIR / day)})
+        else:
+            message = "BUG: External Codex status/output validation failed after dashboard refresh."
+            write_daily_run_status(
+                {
+                    "run_id": run_id,
+                    "date": day,
+                    "status": "bug",
+                    "step": "codex_status_bug",
+                    "message": message,
+                    "archive_path": rel(DAILY_DIR / day),
+                    "generated_by": "external_codex:daily-paper-triage",
+                    "codex_status": status.get("codex_status") or "unknown_stale",
+                    "codex_output_validation": validation,
+                    "completed_at": utc_now(),
+                }
+            )
+            append_daily_run_log(run_id, "codex_status_bug", message, validation=validation)
+            append_event("daily_codex_status_bug", {"date": day, "path": rel(DAILY_DIR / day), "validation": validation})
+        return read_daily_run_status()
+
+    if stale:
+        message = "BUG: External Codex run is stale and required Daily outputs are missing."
+        write_daily_run_status(
+            {
+                "run_id": run_id,
+                "date": day,
+                "status": "bug",
+                "step": "codex_status_bug",
+                "message": message,
+                "codex_status": status.get("codex_status") or "stale_running",
+                "codex_output_validation": validation,
+                "completed_at": utc_now(),
+            }
+        )
+        append_daily_run_log(run_id, "codex_status_bug", message, validation=validation)
+        append_event("daily_codex_status_bug", {"date": day, "validation": validation})
+        return read_daily_run_status()
+
+    return status
+
 def recent_daily_logs(limit: int = 120) -> list[dict[str, Any]]:
     return read_jsonl(DAILY_RUN_LOG_PATH)[-limit:]
 
@@ -1143,6 +1368,7 @@ def list_daily_runs() -> list[dict[str, Any]]:
                 "digest": markdown_record(path / "digest.md"),
                 "deep_read_candidates": read_json(path / "deep_read_candidates.json", None),
                 "quick_reads": read_json(path / "quick_reads.json", None),
+                "output_validation": validate_daily_outputs(path.name),
                 "mindmap": mindmap_record(path / "mindmap.json"),
             }
         )
@@ -1157,6 +1383,7 @@ def daily_archive_record(day: str) -> dict[str, Any]:
         "digest": markdown_record(path / "digest.md"),
         "deep_read_candidates": read_json(path / "deep_read_candidates.json", None),
         "quick_reads": read_json(path / "quick_reads.json", None),
+        "output_validation": validate_daily_outputs(day),
         "mindmap": mindmap_record(path / "mindmap.json"),
     }
 
@@ -1415,6 +1642,7 @@ def latest_daily(daily_runs: list[dict[str, Any]]) -> dict[str, Any] | None:
 
 
 def build_dashboard() -> dict[str, Any]:
+    daily_status = reconcile_daily_run_status()
     papers = list_papers()
     themes = list_themes()
     daily_runs = list_daily_runs()
@@ -1446,7 +1674,7 @@ def build_dashboard() -> dict[str, Any]:
         "themes": themes,
         "daily_runs": daily_runs,
         "latest_daily": latest_daily(daily_runs),
-        "daily_run_status": read_daily_run_status(),
+        "daily_run_status": daily_status,
         "messages": messages,
     }
 
@@ -1519,7 +1747,7 @@ class RequestHandler(SimpleHTTPRequestHandler):
                 limit = max(1, min(500, int(limit_text)))
             except ValueError:
                 limit = 120
-            self.send_json({"ok": True, "logs": recent_daily_logs(limit), "status": read_daily_run_status()})
+            self.send_json({"ok": True, "logs": recent_daily_logs(limit), "status": reconcile_daily_run_status()})
             return
         if parsed.path == "/api/file":
             self.serve_local_file(parsed)
@@ -1809,7 +2037,20 @@ class RequestHandler(SimpleHTTPRequestHandler):
         if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", day):
             self.send_error(HTTPStatus.BAD_REQUEST, "date must be YYYY-MM-DD")
             return
+        force = bool(payload.get("force", False))
+        current_daily_status = reconcile_daily_run_status()
+        if current_daily_status and current_daily_status.get("status") == "running":
+            self.send_json(
+                {
+                    "ok": False,
+                    "error": "A Daily workflow is already running.",
+                    "daily_run_status": current_daily_status,
+                },
+                HTTPStatus.CONFLICT,
+            )
+            return
         run_id = f"daily_{day}_{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S%f')}"
+        output_snapshot = daily_output_snapshot(day) if force else None
         write_daily_run_status(
             {
                 "run_id": run_id,
@@ -1820,9 +2061,11 @@ class RequestHandler(SimpleHTTPRequestHandler):
                 "source": "local_site",
                 "skill": "daily-paper-triage",
                 "started_at": utc_now(),
+                "force": force,
+                "output_snapshot": output_snapshot,
             }
         )
-        append_daily_run_log(run_id, "request_started", "Daily workflow started from the local site.", date=day)
+        append_daily_run_log(run_id, "request_started", "Daily workflow started from the local site.", date=day, force=force)
         append_event("daily_archive_request_started", {"date": day, "source": "local_site"})
         refresh_queue = bool(payload.get("refresh_queue", REFRESH_QUEUE_DAILY_DEFAULT))
         queue_refresh = {
@@ -1920,16 +2163,18 @@ class RequestHandler(SimpleHTTPRequestHandler):
             ]
             required_outputs_exist = all(path.exists() for path in required)
             missing_outputs = [rel(path) for path in required if not path.exists()]
+            output_validation = validate_daily_outputs(day, output_snapshot if force else None)
+            required_outputs_ok = required_outputs_exist and output_validation["ok"]
             write_daily_run_status(
                 {
                     "run_id": run_id,
                     "date": day,
-                    "status": "running" if codex_result["ok"] and required_outputs_exist else "failed",
+                    "status": "running" if codex_result["ok"] and required_outputs_ok else "failed",
                     "step": "codex_invocation_completed",
                     "message": (
-                        "External Codex completed and required outputs exist."
-                        if codex_result["ok"] and required_outputs_exist
-                        else "External Codex failed or did not produce all required outputs."
+                        "External Codex completed and required outputs passed validation."
+                        if codex_result["ok"] and required_outputs_ok
+                        else "External Codex failed, missed outputs, or produced invalid Daily outputs."
                     ),
                     "queue_refresh": queue_refresh,
                     "codex_ok": codex_result["ok"],
@@ -1939,21 +2184,23 @@ class RequestHandler(SimpleHTTPRequestHandler):
                     "codex_returncode": codex_result.get("returncode"),
                     "required_outputs": [rel(path) for path in required],
                     "missing_outputs": missing_outputs,
+                    "codex_output_validation": output_validation,
                 }
             )
             append_daily_run_log(
                 run_id,
                 "codex_invocation_completed",
                 (
-                    "External Codex completed and required outputs exist."
-                    if codex_result["ok"] and required_outputs_exist
-                    else "External Codex failed or did not produce all required outputs."
+                    "External Codex completed and required outputs passed validation."
+                    if codex_result["ok"] and required_outputs_ok
+                    else "External Codex failed, missed outputs, or produced invalid Daily outputs."
                 ),
                 ok=codex_result["ok"],
                 status=codex_result["status"],
                 returncode=codex_result.get("returncode"),
                 required_outputs_exist=required_outputs_exist,
                 missing_outputs=missing_outputs,
+                validation=output_validation,
             )
             append_event(
                 "daily_codex_invocation_completed",
@@ -1963,9 +2210,10 @@ class RequestHandler(SimpleHTTPRequestHandler):
                     "reply_status": codex_result["status"],
                     "ok": codex_result["ok"],
                     "required_outputs_exist": required_outputs_exist,
+                    "output_validation_ok": output_validation["ok"],
                 },
             )
-            if codex_result["ok"] and required_outputs_exist:
+            if codex_result["ok"] and required_outputs_ok:
                 sanitize_daily_candidates(day, list_papers())
                 append_event(
                     "daily_archive_codex_generated",
@@ -2004,6 +2252,7 @@ class RequestHandler(SimpleHTTPRequestHandler):
                             "codex_returncode": codex_result.get("returncode"),
                             "required_outputs": [rel(path) for path in required],
                             "missing_outputs": missing_outputs,
+                            "codex_output_validation": output_validation,
                             "daily_run_status": read_daily_run_status(),
                         },
                         HTTPStatus.FAILED_DEPENDENCY,
@@ -2136,7 +2385,13 @@ class RequestHandler(SimpleHTTPRequestHandler):
         self.wfile.write(body)
 
     def log_message(self, format: str, *args: Any) -> None:
-        sys.stderr.write("[%s] %s\n" % (self.log_date_time_string(), format % args))
+        stream = getattr(sys, "stderr", None)
+        if stream is None:
+            return
+        try:
+            stream.write("[%s] %s\n" % (self.log_date_time_string(), format % args))
+        except (OSError, ValueError, AttributeError):
+            return
 
 
 def parse_args() -> argparse.Namespace:

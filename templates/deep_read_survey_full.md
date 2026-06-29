@@ -26,7 +26,7 @@
 
 ---
 
-## 1. 核心结论与范围定位（executive takeaway and scope positioning）
+## 核心结论与范围定位
 
 用 3-5 句话写出这篇综述最值得记住的抓手。
 
@@ -58,9 +58,9 @@ Figure source:
 
 ---
 
-## 2. 范围、边界与相邻综述（scope, boundary, and adjacent surveys）
+## 范围、边界与相邻综述
 
-### 2.1 研究对象与范围
+### 研究对象与范围
 
 说明该综述关注的对象、任务、技术、系统、交互场景或研究领域。
 
@@ -68,7 +68,7 @@ Figure source:
 
 * （文件名：xxx.pdf，第 x 页）
 
-### 2.2 纳入与排除边界
+### 纳入与排除边界
 
 | Boundary type | Description | Evidence |
 | ------------- | ----------- | -------- |
@@ -83,7 +83,7 @@ Figure source:
 3. 是否存在潜在遗漏；
 4. 是否足以支撑后续 taxonomy。
 
-### 2.3 与相邻综述的关系
+### 与相邻综述的关系
 
 > full survey report 必须尝试相邻综述检索；不得把未确认候选写成确定结论。
 
@@ -97,9 +97,9 @@ Figure source:
 
 ---
 
-## 3. 组织逻辑与分类框架（review logic and taxonomy）
+## 组织逻辑与分类框架
 
-### 3.1 综述思路与组织角度
+### 综述思路与组织角度
 
 说明作者如何组织领域。
 
@@ -117,13 +117,13 @@ Figure source:
 
 * （文件名：xxx.pdf，第 x 页）
 
-### 3.2 Taxonomy 重建
+### Taxonomy 重建
 
 | Category | Definition | Representative works | Why this category matters | Evidence |
 | -------- | ---------- | -------------------- | ------------------------- | -------- |
 |          |            |                      |                           | （文件名：xxx.pdf，第 x 页） |
 
-### 3.3 Taxonomy 质量判断
+### Taxonomy 质量判断
 
 检查：
 
@@ -135,11 +135,11 @@ Figure source:
 
 ---
 
-## 4. 按分类框架梳理内容（content synthesis by taxonomy）
+## 按分类框架梳理内容
 
 > 根据论文实际分类增删小节。
 
-### 4.1 Category A: <name>
+### Category A: <name>
 
 * 核心问题：
 * 代表方法 / 系统 / 数据集：
@@ -148,7 +148,7 @@ Figure source:
 * 局限：
 * 与用户研究的关系：
 
-### 4.2 Category B: <name>
+### Category B: <name>
 
 * 核心问题：
 * 代表方法 / 系统 / 数据集：
@@ -157,7 +157,7 @@ Figure source:
 * 局限：
 * 与用户研究的关系：
 
-### 4.3 Category C: <name>
+### Category C: <name>
 
 * 核心问题：
 * 代表方法 / 系统 / 数据集：
@@ -168,9 +168,9 @@ Figure source:
 
 ---
 
-## 5. Scope-taxonomy 对齐、挑战与未来方向（alignment, challenges, and future directions）
+## Scope-taxonomy 对齐、挑战与未来方向
 
-### 5.1 Scope-taxonomy 检查
+### Scope-taxonomy 检查
 
 | Survey claim / scope decision | Evidence | Strength | What it covers | What may be missing |
 | ----------------------------- | -------- | -------- | -------------- | ------------------- |
@@ -186,7 +186,7 @@ Figure source:
 6. 是否遗漏相邻方向或相邻综述；
 7. challenges 和 future directions 是否由前文内容自然推出。
 
-### 5.2 当前挑战
+### 当前挑战
 
 | Challenge | Description | Evidence | Why it matters |
 | --------- | ----------- | -------- | -------------- |
@@ -198,7 +198,7 @@ Figure source:
 * 可由综述内容支持的挑战：
 * 证据缺口与迁移风险判断：
 
-### 5.3 未来研究方向
+### 未来研究方向
 
 | Direction | Proposed by paper or inferred? | Evidence | Relation to user research |
 | --------- | ------------------------------ | -------- | ------------------------- |
@@ -206,9 +206,9 @@ Figure source:
 
 ---
 
-## 6. 作者后续、外部验证与局限（author follow-up, verification, and limitations）
+## 作者后续、外部验证与局限
 
-### 6.1 作者后续工作与 future directions 对照
+### 作者后续工作与 future directions 对照
 
 | Work | Year | Author overlap | Relation to proposed future direction | Evidence source | Confidence |
 | ---- | ---: | -------------- | ------------------------------------- | --------------- | ---------- |
@@ -218,7 +218,7 @@ Figure source:
 
 > 作者后续工作需要外部检索确认；当前不能可靠判断其是否回应了综述中的 future directions。
 
-### 6.2 作者承认的局限
+### 作者承认的局限
 
 *
 
@@ -226,7 +226,7 @@ Figure source:
 
 * （文件名：xxx.pdf，第 x 页）
 
-### 6.3 证据缺口与迁移风险判断
+### 证据缺口与迁移风险判断
 
 重点检查：
 
@@ -241,29 +241,29 @@ Figure source:
 
 ---
 
-## 7. 对用户研究的借鉴与后续问题（transferable insights and follow-up questions）
+## 对用户研究的借鉴与后续问题
 
-### 7.1 可借鉴的综述组织方式
-
-*
-
-### 7.2 可借鉴的分类维度
+### 可借鉴的综述组织方式
 
 *
 
-### 7.3 可借鉴的挑战表述
+### 可借鉴的分类维度
 
 *
 
-### 7.4 可借鉴的未来方向表述
+### 可借鉴的挑战表述
 
 *
 
-### 7.5 不适合直接照搬的地方
+### 可借鉴的未来方向表述
 
 *
 
-### 7.6 同行研究者视角的后续方向
+### 不适合直接照搬的地方
+
+*
+
+### 同行研究者视角的后续方向
 
 | Direction | Responds to which survey gap | Possible next step | Relation to user research |
 | --------- | ---------------------------- | ------------------ | ------------------------- |
@@ -271,15 +271,15 @@ Figure source:
 
 ---
 
-## 8. 英文写作与 oral 可用素材（English-ready takeaways）
+## 英文写作与 oral 可用素材
 
-### 8.1 Key terms
+### Key terms
 
 | 中文术语 | English term |
 | -------- | ------------ |
 |          |              |
 
-### 8.2 Possible English phrasing
+### Possible English phrasing
 
 * This survey defines the scope of ...
 * The authors organize the literature around ...
@@ -287,13 +287,13 @@ Figure source:
 * The field still lacks ...
 * This survey is useful for my review because ...
 
-### 8.3 One-slide takeaway
+### One-slide takeaway
 
 *
 *
 *
 
-### 8.4 Oral explanation
+### Oral explanation
 
 用自然英文写一段 30-60 秒 oral 说明：
 

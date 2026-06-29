@@ -76,6 +76,7 @@ const STATUS_LABELS = {
   open: "待处理",
   completed: "已完成",
   failed: "失败",
+  bug: "状态异常",
   running: "运行中",
   synthesis_ready: "综述就绪",
   state_only: "仅有状态",
@@ -179,6 +180,7 @@ async function load() {
     render();
     toast("数据已刷新");
   } catch (error) {
+    contentPanel.classList.remove("is-reader-view");
     contentPanel.innerHTML = `<div class="empty-state"><h2>加载失败</h2><p>${escapeHtml(error.message)}</p></div>`;
   } finally {
     refreshButton.disabled = false;
@@ -238,7 +240,17 @@ function renderPaperFilterBar() {
   });
 }
 
+function renderDailyWorkflowButton() {
+  if (!dailyWorkflowButton) return;
+  const today = todayDateString();
+  const hasToday = hasDailyRun(today);
+  const title = hasToday ? "重新进行今天的论文速读" : "开始今天的论文速读";
+  const description = hasToday ? "覆盖今日总结并重新生成精读候选" : "从 Zotero 待读列表生成今日总结和精读候选";
+  dailyWorkflowButton.innerHTML = `<span>${escapeHtml(title)}</span><small>${escapeHtml(description)}</small>`;
+}
+
 function renderDailyRunStatus() {
+  renderDailyWorkflowButton();
   if (!dailyRunStatus) return;
   const status = state.dashboard?.daily_run_status;
   const logPath = status?.log_path || state.dashboard?.repo?.daily_run_log || "state/daily_run_log.jsonl";
@@ -292,7 +304,7 @@ function renderDailyDebugPanel() {
         <h3>Daily 运行状态</h3>
         <p class="muted">外部 Codex 调用 <code>$daily-paper-triage</code> 的状态、产物校验与最近日志。</p>
       </div>
-      <span class="badge ${status.status === "completed" ? "good" : status.status === "failed" ? "warn" : ""}">${escapeHtml(status.status || "unknown")}</span>
+      <span class="badge ${status.status === "completed" ? "good" : status.status === "failed" || status.status === "bug" ? "warn" : ""}">${escapeHtml(status.status || "unknown")}</span>
     </div>
     <div class="meta-grid">
       ${meta("Run ID", status.run_id)}
@@ -360,6 +372,7 @@ function renderDetail() {
   const item = selectedItem();
   if (!item) {
     detailHeader.innerHTML = "";
+    contentPanel.classList.remove("is-reader-view");
     contentPanel.innerHTML = document.querySelector("#emptyStateTemplate").innerHTML;
     return;
   }
@@ -377,6 +390,7 @@ function renderDetail() {
     map: renderMap,
     interact: renderInteraction,
   };
+  contentPanel.classList.toggle("is-reader-view", item.kind === "paper" && ["quick", "deep"].includes(state.view));
   contentPanel.innerHTML = renderers[state.view](item);
   bindDetailActions(item);
 }
@@ -498,10 +512,18 @@ function renderTodoOverview(todo) {
 }
 
 function renderArchiveOverview(run) {
+  const validation = run.output_validation;
+  const validationIssues = validation && !validation.ok
+    ? `<section class="daily-validation-alert">
+        <h3>Daily 输出异常</h3>
+        <ul>${(validation.issues || []).map((issue) => `<li>${escapeHtml(issue)}</li>`).join("")}</ul>
+      </section>`
+    : "";
   return `<div class="meta-grid">
     ${meta("Date", run.date)}
     ${asset("Digest", run.digest)}
   </div>
+  ${validationIssues}
   ${renderMarkdown(run.digest?.content || "")}
   ${renderDailyDebugPanel()}`;
 }
@@ -970,22 +992,40 @@ async function handleDailyTodo() {
   await handleDailyWorkflow();
 }
 
-async function handleDailyWorkflow() {
-  const previousLabel = dailyWorkflowButton?.textContent || "";
+function todayDateString() {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, "0");
+  const day = String(today.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function hasDailyRun(date) {
+  return Boolean((state.dashboard?.daily_runs || []).find((run) => run.date === date));
+}
+
+async function handleDailyWorkflow(options = {}) {
+  const targetDate = options.date || todayDateString();
+  const force = Boolean(options.force || hasDailyRun(targetDate));
+  if (force) {
+    const confirmed = window.confirm(`\u91cd\u65b0\u8fdb\u884c\u4eca\u5929\u7684\u8bba\u6587\u901f\u8bfb\uff1f\n\n\u8fd9\u4f1a\u8986\u76d6 outputs/daily/${targetDate}/ \u4e0b\u7684 digest.md\u3001quick_reads.json \u548c deep_read_candidates.json\u3002`);
+    if (!confirmed) return;
+  }
+  const previousLabel = dailyWorkflowButton?.innerHTML || "";
   try {
     if (dailyWorkflowButton) {
       dailyWorkflowButton.disabled = true;
-      dailyWorkflowButton.textContent = "Daily 生成中...";
+      dailyWorkflowButton.innerHTML = `<span>Daily 生成中...</span><small>${escapeHtml(targetDate)}</small>`;
     }
-    setOptimisticDailyRunningStatus();
+    setOptimisticDailyRunningStatus(targetDate);
     startDailyStatusPolling();
-    await triggerDailyArchive();
+    await triggerDailyArchive(targetDate, { force });
     await load();
     state.mode = "archives";
-    state.selectedId = state.dashboard?.latest_daily?.date || currentItems()[0]?.id || null;
+    state.selectedId = targetDate || state.dashboard?.latest_daily?.date || currentItems()[0]?.id || null;
     state.view = "overview";
     render();
-    toast("已生成当日归档并同步本地状态");
+    toast("\u5df2\u751f\u6210\u5f53\u65e5\u5f52\u6863\u5e76\u540c\u6b65\u672c\u5730\u72b6\u6001");
   } catch (error) {
     await refreshDashboardQuietly();
     toast(error.message);
@@ -993,18 +1033,20 @@ async function handleDailyWorkflow() {
     stopDailyStatusPolling();
     if (dailyWorkflowButton) {
       dailyWorkflowButton.disabled = false;
-      dailyWorkflowButton.textContent = previousLabel;
+      dailyWorkflowButton.innerHTML = previousLabel;
+      renderDailyWorkflowButton();
     }
   }
 }
 
-function setOptimisticDailyRunningStatus() {
+function setOptimisticDailyRunningStatus(date = todayDateString()) {
   if (!state.dashboard) return;
   dailyRunStatusCollapsed = false;
   window.localStorage.setItem("dailyRunStatusCollapsed", "false");
   const now = new Date().toISOString();
   state.dashboard.daily_run_status = {
     ...(state.dashboard.daily_run_status || {}),
+    date,
     status: "running",
     step: "request_started",
     message: "Daily 生成中：正在刷新 Zotero todo 队列并调用 $daily-paper-triage。",
@@ -1199,7 +1241,7 @@ function labelForEvidence(evidence = "") {
 
 function statusClass(status = "") {
   if (status.includes("done") || status.includes("approved") || status.includes("ready") || status.includes("queued_for")) return "good";
-  if (status.includes("missing") || status.includes("open") || status.includes("failed") || status.includes("error") || status.includes("timeout")) return "warn";
+  if (status.includes("missing") || status.includes("open") || status.includes("failed") || status.includes("error") || status.includes("timeout") || status.includes("bug")) return "warn";
   return "";
 }
 

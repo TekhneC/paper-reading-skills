@@ -28,7 +28,7 @@
 
 ---
 
-## 1. 核心结论与阅读定位（executive takeaway）
+## 核心结论与阅读定位
 
 用 3-5 句话写出这篇论文的记忆抓手。
 
@@ -60,9 +60,9 @@ Figure source:
 
 ---
 
-## 2. 问题、动机与核心思路（problem, motivation, and idea）
+## 问题、动机与核心思路
 
-### 2.1 作者明确声称的问题
+### 作者明确声称的问题
 
 *
 
@@ -70,65 +70,65 @@ Figure source:
 
 * （文件名：xxx.pdf，第 x 页）
 
-### 2.2 既有工作的不足
+### 既有工作的不足
 
 *
 
-### 2.3 Central insight 与关键假设
+### Central insight 与关键假设
 
 *
 
-### 2.4 证据支持度与问题成立性判断
+### 证据支持度与问题成立性判断
 
 *
 
 ---
 
-## 3. 评价标尺与证据设计（evaluation metrics and evidence design）
+## 评价标尺与证据设计
 
 > compact report 仍必须保留 metrics-first，不可压掉评价逻辑。
 
-### 3.1 评价目标
+### 评价目标
 
 *
 
-### 3.2 核心指标、数据集与 benchmark
+### 核心指标、数据集与 benchmark
 
 | Dataset / Benchmark | Metric | What it measures | Relation to claim | Main limitation |
 | ------------------- | ------ | ---------------- | ----------------- | --------------- |
 |                     |        |                  |                   |                 |
 
-### 3.3 指标是否支撑主张
+### 指标是否支撑主张
 
 *
 
 ---
 
-## 4. 方法机制与实验结果（method and results）
+## 方法机制与实验结果
 
-### 4.1 方法总览
+### 方法总览
 
 *
 
-### 4.2 核心组件
+### 核心组件
 
 | Component | Function | Evidence |
 | --------- | -------- | -------- |
 |           |          | （文件名：xxx.pdf，第 x 页） |
 
-### 4.3 实验设置与主要结果
+### 实验设置与主要结果
 
 | Result | Evidence | What it supports | What it does not prove |
 | ------ | -------- | ---------------- | ---------------------- |
 |        | （文件名：xxx.pdf，第 x 页） |                  |                        |
 
-### 4.4 消融、定性结果或失败案例
+### 消融、定性结果或失败案例
 
 *
 
 ---
 
-## 5. Claim-evidence 对齐与局限（alignment and limitations）
+## Claim-evidence 对齐与局限
 
 | Claim | Evidence | Evidence strength | Alignment judgment |
 | ----- | -------- | ----------------- | ------------------ |
@@ -144,47 +144,47 @@ Figure source:
 
 ---
 
-## 6. 谱系、团队线索与外部验证（lineage and verification）
+## 谱系、团队线索与外部验证
 
 > compact report 可以压缩谱系，但不能把未确认线索写成确定结论。
 
-### 6.1 关键前序、baseline 或后续工作
+### 关键前序、baseline 或后续工作
 
 | Work | Year | Relation | Evidence source | Confidence |
 | ---- | ---: | -------- | --------------- | ---------- |
 |      |      |          |                 | confirmed / likely / candidate / unverified |
 
-### 6.2 团队或作者线索
+### 团队或作者线索
 
 *
 
-### 6.3 需要外部确认的事项
+### 需要外部确认的事项
 
 *
 
 ---
 
-## 7. 借鉴视角与英文素材（transferable insights and English-ready material）
+## 借鉴视角与英文素材
 
-### 7.1 对用户研究可借鉴之处
-
-*
-
-### 7.2 不能直接照搬之处
+### 对用户研究可借鉴之处
 
 *
 
-### 7.3 可转化的后续问题
+### 不能直接照搬之处
 
 *
 
-### 7.4 Key terms
+### 可转化的后续问题
+
+*
+
+### Key terms
 
 | 中文术语 | English term |
 | -------- | ------------ |
 |          |              |
 
-### 7.5 One-slide takeaway
+### One-slide takeaway
 
 *
 *

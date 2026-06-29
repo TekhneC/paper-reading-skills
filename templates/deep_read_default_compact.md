@@ -27,7 +27,7 @@
 
 ---
 
-## 1. 类型判定与核心结论（type decision and executive takeaway）
+## 类型判定与核心结论
 
 类型判定：
 
@@ -59,7 +59,7 @@ Figure source:
 
 ---
 
-## 2. 问题、范围与组织角度（problem, scope, and organizing perspective）
+## 问题、范围与组织角度
 
 *
 
@@ -69,7 +69,7 @@ Figure source:
 
 ---
 
-## 3. 评价、证据或分类标尺（evaluation, evidence, or classification standard）
+## 评价、证据或分类标尺
 
 | Standard | What it measures / distinguishes | Evidence | Limitation |
 | -------- | -------------------------------- | -------- | ---------- |
@@ -77,13 +77,13 @@ Figure source:
 
 ---
 
-## 4. 核心内容、方法或论证结构（method, content, or argument）
+## 核心内容、方法或论证结构
 
-### 4.1 核心内容
+### 核心内容
 
 *
 
-### 4.2 主要结果、发现或论点
+### 主要结果、发现或论点
 
 | Result / finding / argument | Evidence | Evidence-gap judgment |
 | --------------------------- | -------- | --------------------- |
@@ -91,7 +91,7 @@ Figure source:
 
 ---
 
-## 5. Alignment 检查与局限（alignment and limitations）
+## Alignment 检查与局限
 
 | Claim / scope / argument | Evidence | Strength | Gap or uncertainty |
 | ------------------------ | -------- | -------- | ------------------ |
@@ -107,7 +107,7 @@ Figure source:
 
 ---
 
-## 6. 外部线索与验证需求（external notes and verification）
+## 外部线索与验证需求
 
 相关工作、作者线索或需要外部确认的事项：
 
@@ -115,27 +115,27 @@ Figure source:
 
 ---
 
-## 7. 借鉴视角与英文素材（transferable insights and English-ready material）
+## 借鉴视角与英文素材
 
-### 7.1 对用户研究可借鉴之处
-
-*
-
-### 7.2 不适合直接照搬之处
+### 对用户研究可借鉴之处
 
 *
 
-### 7.3 可转化的后续问题
+### 不适合直接照搬之处
 
 *
 
-### 7.4 Key terms
+### 可转化的后续问题
+
+*
+
+### Key terms
 
 | 中文术语 | English term |
 | -------- | ------------ |
 |          |              |
 
-### 7.5 One-slide takeaway
+### One-slide takeaway
 
 *
 *

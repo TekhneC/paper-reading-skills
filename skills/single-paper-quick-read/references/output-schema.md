@@ -12,10 +12,29 @@ outputs/papers/<paper_key>/quick_read.md
 
 If `paper_key` is unavailable, use a safe title slug. Do not silently overwrite existing outputs; use timestamped alternates unless replacement is approved.
 
-The Markdown file must include a stable machine-readable summary block near the top so daily triage can aggregate even when JSON is unavailable.
+Machine-readable data belongs in the JSON sidecar. Do not add a duplicate machine-readable JSON block to the Markdown template unless the user explicitly requests it.
+
+## 理由矩阵规则
+
+Markdown quick-read 的理由矩阵默认只保留以下维度：
+
+```text
+research_fit
+task_formulation
+method_mechanism
+evaluation_metrics
+evidence_confidence
+```
+
+如果论文存在额外出彩维度，可以在理由矩阵中增补一行，例如：
+
+```text
+novel_framing
+```
+
+额外维度必须有明确理由；不要为了填满表格而添加。
 
 ## JSON Sidecar
-
 Default path:
 
 ```text

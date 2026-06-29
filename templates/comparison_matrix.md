@@ -16,7 +16,7 @@
 
 ---
 
-## 1. Matrix design note
+## Matrix design note
 
 说明本矩阵服务的比较目标：
 
@@ -30,7 +30,7 @@ Active comparison dimensions:
 
 ---
 
-## 2. Paper role overview
+## Paper role overview
 
 | Paper | Year | Role                                                                                                                                                                                                                                 | Evidence status                                                | Included in main comparison? |
 | ----- | ---: | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------- | ---------------------------- |
@@ -38,7 +38,7 @@ Active comparison dimensions:
 
 ---
 
-## 3. Main comparison matrix
+## Main comparison matrix
 
 > Adapt columns to the confirmed research question. Do not fill unknown cells by guessing.
 
@@ -48,7 +48,7 @@ Active comparison dimensions:
 
 ---
 
-## 4. Evaluation-focused matrix
+## Evaluation-focused matrix
 
 > Use when evaluation is central to the theme.
 
@@ -58,7 +58,7 @@ Active comparison dimensions:
 
 ---
 
-## 5. Taxonomy-focused matrix
+## Taxonomy-focused matrix
 
 > Use when taxonomy or classification is central to the theme.
 
@@ -68,7 +68,7 @@ Active comparison dimensions:
 
 ---
 
-## 6. Field-lineage matrix
+## Field-lineage matrix
 
 > Use when tracing field lineage and supplementary readings.
 
@@ -78,25 +78,25 @@ Active comparison dimensions:
 
 ---
 
-## 7. Matrix-based synthesis notes
+## Matrix-based synthesis notes
 
-### 7.1 Common pattern
-
-*
-
-### 7.2 Key differences
+### Common pattern
 
 *
 
-### 7.3 Emerging tensions
+### Key differences
 
 *
 
-### 7.4 Evidence gaps
+### Emerging tensions
 
 *
 
-### 7.5 Matrix cells needing verification
+### Evidence gaps
+
+*
+
+### Matrix cells needing verification
 
 | Paper / Work | Cell / Dimension | What is uncertain | Needed action                                                |
 | ------------ | ---------------- | ----------------- | ------------------------------------------------------------ |

@@ -26,7 +26,7 @@
 
 ---
 
-## 1. 核心结论与范围定位（executive takeaway and scope）
+## 核心结论与范围定位
 
 用 3-5 句话写出这篇综述最值得记住的抓手。
 
@@ -58,9 +58,9 @@ Figure source:
 
 ---
 
-## 2. 范围、边界与相邻综述（scope, boundary, and adjacent surveys）
+## 范围、边界与相邻综述
 
-### 2.1 综述范围
+### 综述范围
 
 *
 
@@ -68,7 +68,7 @@ Figure source:
 
 * （文件名：xxx.pdf，第 x 页）
 
-### 2.2 纳入与排除边界
+### 纳入与排除边界
 
 | Boundary type | Description | Evidence |
 | ------------- | ----------- | -------- |
@@ -76,7 +76,7 @@ Figure source:
 | Exclusion criteria | | （文件名：xxx.pdf，第 x 页） |
 | Adjacent areas mentioned but not covered | | （文件名：xxx.pdf，第 x 页） |
 
-### 2.3 相邻综述或外部确认需求
+### 相邻综述或外部确认需求
 
 | Survey / clue | Relation | Confidence | Note |
 | ------------- | -------- | ---------- | ---- |
@@ -84,25 +84,25 @@ Figure source:
 
 ---
 
-## 3. 组织逻辑与分类框架（review logic and taxonomy）
+## 组织逻辑与分类框架
 
-### 3.1 组织角度
+### 组织角度
 
 *
 
-### 3.2 Taxonomy
+### Taxonomy
 
 | Category | Definition | Representative works | Evidence |
 | -------- | ---------- | -------------------- | -------- |
 |          |            |                      | （文件名：xxx.pdf，第 x 页） |
 
-### 3.3 Taxonomy 有效性与可迁移性判断
+### Taxonomy 有效性与可迁移性判断
 
 *
 
 ---
 
-## 4. 内容综合与代表进展（content synthesis）
+## 内容综合与代表进展
 
 > 根据论文实际分类增删小节。
 
@@ -112,19 +112,19 @@ Figure source:
 
 ---
 
-## 5. Scope-taxonomy 对齐、挑战与未来方向（alignment, challenges, and directions）
+## Scope-taxonomy 对齐、挑战与未来方向
 
-### 5.1 Scope-taxonomy 检查
+### Scope-taxonomy 检查
 
 *
 
-### 5.2 当前挑战
+### 当前挑战
 
 | Challenge | Evidence | Why it matters |
 | --------- | -------- | -------------- |
 |           | （文件名：xxx.pdf，第 x 页） |                |
 
-### 5.3 未来研究方向
+### 未来研究方向
 
 | Direction | Proposed by paper or inferred? | Relation to user research |
 | --------- | ------------------------------ | ------------------------- |
@@ -132,43 +132,43 @@ Figure source:
 
 ---
 
-## 6. 局限、外部线索与验证需求（limitations and verification）
+## 局限、外部线索与验证需求
 
-### 6.1 作者承认的局限
-
-*
-
-### 6.2 证据缺口与迁移风险判断
+### 作者承认的局限
 
 *
 
-### 6.3 需要外部确认的事项
+### 证据缺口与迁移风险判断
+
+*
+
+### 需要外部确认的事项
 
 *
 
 ---
 
-## 7. 借鉴视角与英文素材（transferable insights and English-ready material）
+## 借鉴视角与英文素材
 
-### 7.1 对用户研究可借鉴之处
-
-*
-
-### 7.2 不适合直接照搬之处
+### 对用户研究可借鉴之处
 
 *
 
-### 7.3 可转化的后续问题
+### 不适合直接照搬之处
 
 *
 
-### 7.4 Key terms
+### 可转化的后续问题
+
+*
+
+### Key terms
 
 | 中文术语 | English term |
 | -------- | ------------ |
 |          |              |
 
-### 7.5 One-slide takeaway
+### One-slide takeaway
 
 *
 *

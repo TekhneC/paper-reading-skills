@@ -24,6 +24,7 @@
 body {
   margin: 0;
   min-height: 100vh;
+  overflow: hidden;
   background: var(--bg);
   color: var(--text);
   font-family:
@@ -41,7 +42,9 @@ textarea {
 .app-shell {
   display: grid;
   grid-template-columns: minmax(320px, 400px) minmax(0, 1fr);
-  min-height: 100vh;
+  height: 100vh;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .app-shell.sidebar-collapsed {
@@ -148,23 +151,46 @@ h3 {
   min-height: 0;
   flex-direction: column;
   gap: 16px;
-  overflow-y: auto;
+  overflow: hidden;
   overflow-x: hidden;
   padding-right: 4px;
-  scrollbar-gutter: stable;
 }
 
-.sidebar-scroll::-webkit-scrollbar {
+.sidebar-scroll > .segmented,
+.sidebar-scroll > .paper-filter-bar,
+.sidebar-scroll > .search-box {
+  flex: 0 0 auto;
+}
+
+.item-list,
+.content-panel,
+.rendered-markdown-editor,
+.markdown-source-editor {
+  scrollbar-color: #c6d0da transparent;
+  scrollbar-width: thin;
+}
+
+.item-list::-webkit-scrollbar,
+.content-panel::-webkit-scrollbar,
+.rendered-markdown-editor::-webkit-scrollbar,
+.markdown-source-editor::-webkit-scrollbar {
   width: 9px;
+  height: 9px;
 }
 
-.sidebar-scroll::-webkit-scrollbar-thumb {
+.item-list::-webkit-scrollbar-thumb,
+.content-panel::-webkit-scrollbar-thumb,
+.rendered-markdown-editor::-webkit-scrollbar-thumb,
+.markdown-source-editor::-webkit-scrollbar-thumb {
   border: 2px solid #fbfcfd;
   border-radius: 999px;
   background: #c6d0da;
 }
 
-.sidebar-scroll::-webkit-scrollbar-track {
+.item-list::-webkit-scrollbar-track,
+.content-panel::-webkit-scrollbar-track,
+.rendered-markdown-editor::-webkit-scrollbar-track,
+.markdown-source-editor::-webkit-scrollbar-track {
   background: transparent;
 }
 
@@ -312,11 +338,14 @@ h3 {
 
 .item-list {
   display: flex;
-  flex: 0 0 auto;
+  flex: 1 1 auto;
   flex-direction: column;
   gap: 8px;
-  overflow: visible;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
   padding-right: 2px;
+  scrollbar-gutter: stable;
 }
 
 .sidebar-workflow {
@@ -493,9 +522,11 @@ h3 {
   display: grid;
   grid-template-rows: auto auto minmax(0, 1fr);
   gap: 14px;
-  padding: 22px;
+  height: 100vh;
   min-width: 0;
-  min-height: 100vh;
+  min-height: 0;
+  overflow: hidden;
+  padding: 22px;
 }
 
 .detail-header,
@@ -557,6 +588,31 @@ h3 {
   min-height: 0;
   overflow: auto;
   padding: 22px;
+}
+
+.content-panel.is-reader-view {
+  overflow: hidden;
+}
+
+.content-panel.is-reader-view .split-reader {
+  height: 100%;
+  min-height: 0;
+  align-items: stretch;
+}
+
+.content-panel.is-reader-view .editor-pane,
+.content-panel.is-reader-view .source-pane {
+  grid-template-rows: auto minmax(0, 1fr);
+  height: 100%;
+  min-height: 0;
+}
+
+.content-panel.is-reader-view .rendered-markdown-editor,
+.content-panel.is-reader-view .markdown-source-editor,
+.content-panel.is-reader-view .source-body,
+.content-panel.is-reader-view .deep-interaction-body {
+  height: 100%;
+  min-height: 0;
 }
 
 .overview-stack {
@@ -763,6 +819,11 @@ pre {
 
 .markdown pre code,
 pre code {
+  display: block;
+  background: transparent;
+  color: inherit;
+  border-radius: 0;
+  padding: 0;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
@@ -804,6 +865,27 @@ pre code {
   border-radius: 8px;
   background: #fff7f7;
   color: var(--danger);
+}
+
+
+.daily-validation-alert {
+  display: grid;
+  gap: 8px;
+  margin: 0 0 18px;
+  padding: 12px 14px;
+  border: 1px solid #e1b8b8;
+  border-radius: 8px;
+  background: var(--danger-weak);
+  color: var(--danger);
+}
+
+.daily-validation-alert h3,
+.daily-validation-alert ul {
+  margin: 0;
+}
+
+.daily-validation-alert ul {
+  padding-left: 20px;
 }
 
 .daily-codex-reply summary,
@@ -1787,9 +1869,16 @@ pre code {
   }
 }
 @media (max-width: 900px) {
+  body {
+    overflow: auto;
+  }
+
   .app-shell,
   .app-shell.sidebar-collapsed {
     grid-template-columns: 1fr;
+    height: auto;
+    min-height: 100vh;
+    overflow: visible;
   }
 
   .sidebar {
@@ -1817,7 +1906,24 @@ pre code {
   }
 
   .workspace {
+    height: auto;
     min-height: auto;
+    overflow: visible;
+  }
+
+  .content-panel,
+  .content-panel.is-reader-view {
+    overflow: visible;
+  }
+
+  .content-panel.is-reader-view .split-reader,
+  .content-panel.is-reader-view .editor-pane,
+  .content-panel.is-reader-view .source-pane,
+  .content-panel.is-reader-view .rendered-markdown-editor,
+  .content-panel.is-reader-view .markdown-source-editor,
+  .content-panel.is-reader-view .source-body,
+  .content-panel.is-reader-view .deep-interaction-body {
+    height: auto;
   }
 
   .title-row {
